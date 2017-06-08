@@ -1,0 +1,7 @@
+psig.h5: only k-space rep. of orbitals
+psir.h5: both k-space and real-space rep.s of orbitals
+
+goal
+----
+create psir2g.h5 which uses psi_r in psir.h5 to generate the psi_g in psig.h5
+name: psir2g.h5
