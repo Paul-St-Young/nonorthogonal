@@ -4,6 +4,8 @@ from nexus import settings, Job, obj, PwscfInput, generate_physical_system
 from nexus import generate_pwscf,generate_pw2qmcpack,generate_qmcpack
 from nexus import vmc,dmc
 
+from qmcpack_input import section,correlation,jastrow1,jastrow2
+
 if __name__ == '__main__':
 
     settings(
@@ -39,7 +41,7 @@ if __name__ == '__main__':
         units  = 'B',
         net_charge = 0,
         net_spin   = 0,
-        kgrid      = (4,4,4), # system must have kpoints to assign twistnums
+        kgrid      = (2,2,2), # system must have kpoints to assign twistnums
         kshift     = (0,0,0)
     )
 
@@ -61,10 +63,19 @@ if __name__ == '__main__':
     scf = generate_pwscf(**scf_input)
     sims.append(scf)
 
+    nscf_input = scf_input.copy()
+    nscf_input.delete(['kgrid','kshift'])
+    nscf_input.identifier = 'nscf'
+    nscf_input.path       = 'nscf'
+    nscf_input.input_type = 'nscf'
+    nscf_input.dependencies = (scf,'charge-density')
+    nscf = generate_pwscf(**nscf_input)
+    sims.append(nscf)
+
     p2q_input = obj(
         identifier = 'p2q',
-        path       = scf_input.path,
-        dependencies = (scf,'orbitals'),
+        path       = nscf_input.path,
+        dependencies = (nscf,'orbitals'),
         job = p2q_job
     )
     p2q = generate_pw2qmcpack(**p2q_input)
@@ -72,17 +83,46 @@ if __name__ == '__main__':
 
     # dmc inputs
     vmc_input = obj(
-        warmupsteps =  40,
-        blocks      =  20,
-        steps       =  10,
+        warmupsteps = 100,
+        blocks      = 100,
+        steps       =   5,
         timestep    = 1.0,
         samples     =  64 # dmc walkers
     )
     dmc_input = obj(
         blocks      = 40,
         steps       = 10,
-        timestep    = 0.01
+        timestep    = 0.02
     )
+    j1coeff = [0.00206602038,-0.002841926986,0.0036266191,-0.001913930279,8.457152991e-06,0.0007380321824,3.635172529e-05,0.0001299635851]
+    j1 = jastrow1(
+        name = 'J1',
+        type = 'One-Body',
+        function = 'bspline',
+        source   = 'ion0',#'H', segfault
+        correlation = correlation(
+            elementtype = 'H',
+            size        = 8,
+            cusp        = 1,
+            coefficients= section(
+                id   = 'eH',
+                type = 'Array',
+                coeff= j1coeff
+            )
+        )
+    )
+    ud_coeff = [0.5954603818,0.5062051797,0.3746940461,0.2521010502,0.144016331,0.07796688253,0.03804420551,0.01449320872]
+    j2 = jastrow2(
+        name = 'J2',
+        type = 'Two-Body',
+        function = 'bspline',
+        correlations = [
+            correlation(speciesA='u',speciesB='d',size=8,
+                coefficients=section(id='JudC',type='Array',coeff=ud_coeff)
+            )
+        ]
+    )
+
     sdmc = generate_qmcpack(
         twistnum    = 0,
         identifier  = 'dmc',
@@ -91,11 +131,24 @@ if __name__ == '__main__':
         input_type  = 'basic',
         system      = system,
         bconds      = 'ppp',
-        jastrows    = [],
+        jastrows    = [j1,j2],
         calculations= [vmc(**vmc_input),dmc(**dmc_input)],
         dependencies= [(p2q,'orbitals')]
     )
     sims.append(sdmc)
+
+    stabc = generate_qmcpack(
+        identifier  = 'tabc',
+        path        = 'tabc',
+        job         = dmc_job,
+        input_type  = 'basic',
+        system      = system,
+        bconds      = 'ppp',
+        jastrows    = [j1,j2],
+        calculations= [vmc(**vmc_input),dmc(**dmc_input)],
+        dependencies= [(p2q,'orbitals')]
+    )
+    sims.append(stabc)
 
     from nexus import ProjectManager
     pm = ProjectManager()
