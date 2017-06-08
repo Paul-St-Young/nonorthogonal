@@ -1,0 +1,110 @@
+<simulation>
+  <project id="bcc" series="0">
+    <application name="qmcapp" role="molecu" class="serial" version="1.0"/>
+  </project>
+  <qmcsystem>
+    <simulationcell>
+      <parameter name="lattice" units="bohr">
+                  3.77945227        0.00000000        0.00000000
+                 -0.00000000        3.77945227        0.00000000
+                 -0.00000000       -0.00000000        3.77945227
+         </parameter>
+      <parameter name="bconds">
+            p p p
+         </parameter>
+      <parameter name="LR_dim_cutoff">    15                 </parameter>
+    </simulationcell>
+    <particleset name="e">
+      <group name="u" size="1" mass="1.0">
+        <parameter name="charge">    -1                    </parameter>
+        <parameter name="mass">    1.0                   </parameter>
+        <attrib condition="0" datatype="posArray" name="position">
+0.209303537946 0.10431630755 -0.00136736273045
+</attrib>
+      </group>
+      <group name="d" size="1" mass="1.0">
+        <parameter name="charge">    -1                    </parameter>
+        <parameter name="mass">    1.0                   </parameter>
+        <attrib condition="0" datatype="posArray" name="position">
+1.33844432045 1.64091342044 1.61167149678
+</attrib>
+      </group>
+      <group name="p" size="2" mass="1836.15267376">
+        <parameter name="charge">    1    </parameter>
+        <parameter name="mass">    1836.15267376    </parameter>
+        <attrib condition="0" datatype="posArray" name="position">
+-0.237067650593 -0.0507707737449 -0.109171119721
+1.96843699111 2.29786134059 1.77227395534
+</attrib>
+      </group>
+    </particleset>
+    <particleset name="wf_centers">
+      <group name="H" size="2">
+        <parameter name="charge">    0                     </parameter>
+        <attrib name="position" datatype="posArray" condition="0">
+                     0.00000000        0.00000000        0.00000000
+                     1.88972614        1.88972614        1.88972614
+            </attrib>
+      </group>
+    </particleset>
+    <wavefunction name="psi0" target="e">
+      <sposet_builder type="einspline" href="../ref/pwscf.pwscf.h5" tilematrix="1 0 0 0 1 0 0 0 1" twistnum="0" source="wf_centers" meshfactor="1.0" precision="double">
+        <sposet name="spo_ud" size="1"/>
+      </sposet_builder>
+      <sposet_builder name="proton_builder" source="wf_centers" transform="yes" type="mo">
+        <basisset>
+          <atomicBasisSet angular="cartesian" elementType="H" normalized="yes" type="GTO">
+            <grid npts="1001" rf="100" ri="1.e-6" type="log"/>
+            <basisGroup l="0" n="1" rid="R0">
+              <radfunc contraction="1.0" exponent="9.0"/>
+            </basisGroup>
+          </atomicBasisSet>
+        </basisset>
+        <!--Identity coefficient matrix by default SPOSetBase::setIdentity-->
+        <sposet id="proton_orbs" name="spo_p" size="2">
+          <coefficient id="HdetC" size="2" type="constArray">
+1.0 0.0
+0.0 1.0
+</coefficient>
+        </sposet>
+      </sposet_builder>
+      <determinantset>
+        <slaterdeterminant>
+          <determinant id="updet" size="1" sposet="spo_ud"/>
+          <determinant id="downdet" size="1" sposet="spo_ud"/>
+          <determinant group="p" id="pdet" no_bftrans="yes" size="2" sposet="spo_p"/>
+        </slaterdeterminant>
+      </determinantset>
+      <jastrow type="Two-Body" name="J2" function="bspline" print="yes">
+        <correlation speciesA="u" speciesB="d" size="8">
+          <coefficients id="ud" type="Array">                  
+0.5954603818 0.5062051797 0.3746940461 0.2521010502 0.1440163317 0.07796688253 
+0.03804420551 0.01449320872
+               </coefficients>
+        </correlation>
+        <correlation speciesA="u" speciesB="p" size="8" cusp="1.0">
+          <coefficients id="up" type="Array">                  
+0.00206602038 -0.002841926986 0.0036266191 -0.001913930279 8.457152991e-06 
+0.0007380321824 3.635172529e-05 0.0001299635851
+               </coefficients>
+        </correlation>
+        <correlation speciesA="d" speciesB="p" size="8" cusp="1.0">
+          <coefficients id="dp" type="Array">                  
+0.00206602038 -0.002841926986 0.0036266191 -0.001913930279 8.457152991e-06 
+0.0007380321824 3.635172529e-05 0.0001299635851
+               </coefficients>
+        </correlation>
+      </jastrow>
+    </wavefunction>
+    <hamiltonian name="h0" type="generic" target="e">
+      <pairpot type="coulomb" name="ElecElec" source="e" target="e"/>
+      <estimator name="skinetic" type="specieskinetic"/>
+      <estimator hdf5="yes" name="latdev" per_xyz="yes" sgroup="H" source="wf_centers" target="e" tgroup="p" type="latticedeviation"/>
+    </hamiltonian>
+  </qmcsystem>
+  <qmc method="vmc" move="wbyw">
+    <parameter name="blocks">    100 </parameter>
+    <parameter name="steps">      10 </parameter>
+    <parameter name="timestep">  0.2 </parameter>
+  </qmc>
+</simulation>
