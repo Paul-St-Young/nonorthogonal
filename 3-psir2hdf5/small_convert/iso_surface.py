@@ -4,14 +4,18 @@ import h5py
 import matplotlib.pyplot as plt
 from pwscf_h5 import PwscfH5
 
-def psig_to_psir(psig,gvec,nx):
-    """ !!!! assuming cubic grid with nx points on each dimension """
+# Yubo "Paul" Yang, June 9 2017
+#  convert between psi_g and psi_r in pwscf.h5 file from pw2qmcpack
+#  note: under write_psir, change tmp_evc to evc and use npw instead of sym_npw
+# !!!! only tested on cubic grid with nx points on each dimension
+
+def psig_to_psir(psig,gvec,psir_shape):
     assert len(psig) == len(gvec)
-    kgrid = np.zeros([nx,nx,nx],dtype=complex)
+    kgrid = np.zeros(psir_shape,dtype=complex)
     for ig in range(len(gvec)):
         kgrid[tuple(gvec[ig])] = psig[ig]
     # end for
-    psir = np.fft.fftshift( np.fft.ifftn(kgrid) ) * nx**3.
+    psir = np.fft.fftshift( np.fft.ifftn(kgrid) ) * np.prod(psir_shape)
     return psir
 # end def
 
@@ -81,7 +85,7 @@ if __name__ == '__main__':
     psir = np.fft.fftshift( psir_arr[:,:,:,0] + 1j*psir_arr[:,:,:,1] )
 
     # convert psi_r to psi_g and vice versa
-    mypsir = psig_to_psir(psig,gvec,12)
+    mypsir = psig_to_psir(psig,gvec,psir.shape)
     mypsig = psir_to_psig(psir,gvec)
 
     nx,ny,nz = psir.shape
@@ -92,7 +96,7 @@ if __name__ == '__main__':
     psig_from_mypsir = psir_to_psig(mypsir,gvec)
     assert np.allclose( psig_from_mypsir.real,psig.real )
 
-    psir_from_mypsig = psig_to_psir(mypsig,gvec,nz)
+    psir_from_mypsig = psig_to_psir(mypsig,gvec,psir.shape)
     # this will not be the same as psir because gvec cuts out some plane waves
     # check visually
 
