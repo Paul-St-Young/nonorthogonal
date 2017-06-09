@@ -9,3 +9,8 @@ Jun 7
 Jun 8
 ----
 3. convert psi_r to hdf5
+
+Jun 9
+----
+4. run bcc-2 using pyscf
+alat = 3.77945227
