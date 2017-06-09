@@ -4,6 +4,16 @@ import h5py
 import matplotlib.pyplot as plt
 from pwscf_h5 import PwscfH5
 
+def psig_to_psir(psig,gvec,nx):
+    assert len(psig) == len(gvec)
+    kgrid = np.zeros([nx,nx,nx])
+    for ig in range(len(gvec)):
+        kgrid[tuple(gvec[ig])] = psig[ig]
+    # end for
+    psir = np.fft.fftshift( np.fft.ifftn(kgrid) ) * nx**3.
+    return psir
+# end def
+
 if __name__ == '__main__':
     # 3D image
     from skimage import measure
@@ -17,11 +27,15 @@ if __name__ == '__main__':
     psir_arr = wf.psir()
 
     psig = psig_arr[:,0] + 1j*psig_arr[:,1]
+    mypsir = psig_to_psir(psig,gvec,12)
     psir = psir_arr[:,:,:,0] + 1j*psir_arr[:,:,:,1]
 
     nx,ny,nz = psir.shape
+    #val = (psir.conj()*psir).real # min: -0.0304, max: 0.03562, then squre
+    val = (mypsir.conj()*mypsir).real
+    print val.min(),val.max()
     verts, faces, normals, values = measure.marching_cubes_lewiner(
-        (psir.conj()*psir).real,0.0012) # min: -0.0304, max: 0.03562
+        val ,1.0)
 
     fig = plt.figure()
     ax  = fig.add_subplot(111,projection='3d')
