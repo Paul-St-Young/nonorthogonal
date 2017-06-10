@@ -114,8 +114,8 @@ if __name__ == '__main__':
                 fig = plt.figure()
                 ax  = fig.add_subplot(121,projection='3d',aspect=1)
                 ax1 = fig.add_subplot(122,projection='3d',aspect=1)
-                isosurf(ax,val)
-                isosurf(ax1,valr)
+                isosurf(ax,val,0.02)
+                isosurf(ax1,valr,0.02)
                 plt.show()
                 break
             # end if
