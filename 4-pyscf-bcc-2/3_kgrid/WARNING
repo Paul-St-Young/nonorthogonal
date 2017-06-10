@@ -1,0 +1,7 @@
+Q1/ Did data lose its complex components?
+A1/ Maybe. pickling data changed the magnitude of psir, but not its shape.
+
+Q2/ Did QE plot use complex components?
+A2/ No. val = np.absolute(pair[0])
+
+Q3/ Is LCAO properly calculated?

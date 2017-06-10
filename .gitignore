@@ -102,3 +102,7 @@ ENV/
 
 # nexus
 results/
+
+# data
+*.dat
+*.h5
