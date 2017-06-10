@@ -46,7 +46,9 @@ if __name__ == '__main__':
     coords = gen_grid.gen_uniform_grids(test.cell)
 
     aoR = test._numint.eval_ao(cell,coords)
-    moR = np.einsum('ri,ia->ra',aoR,test.mo_coeff)
+    moR = np.dot(aoR,test.mo_coeff)
+    print test.mo_coeff.shape
+    #moR = np.einsum('ri,ia->ra',aoR,test.mo_coeff)
     np.savetxt('moR.dat',moR)
 
     """ don't know how to pickle
