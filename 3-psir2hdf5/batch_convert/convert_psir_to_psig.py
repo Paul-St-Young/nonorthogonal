@@ -3,6 +3,8 @@ import numpy as np
 import h5py
 import matplotlib.pyplot as plt
 from pwscf_h5 import PwscfH5
+from skimage import measure
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 # Yubo "Paul" Yang, June 9 2017
 #  convert between psi_g and psi_r in pwscf.h5 file from pw2qmcpack
@@ -88,8 +90,6 @@ def check_psir_psig(loc,wf,gvec):
 
 if __name__ == '__main__':
     # 3D image
-    from skimage import measure
-    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
     wf = PwscfH5()
     wf.read('pwscf.pwscf.h5')
