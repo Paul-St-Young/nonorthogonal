@@ -49,6 +49,7 @@ if __name__ == '__main__':
     moR = np.dot(aoR,test.mo_coeff)
     print test.mo_coeff.shape
     #moR = np.einsum('ri,ia->ra',aoR,test.mo_coeff)
+    np.savetxt('moC.dat',test.mo_coeff)
     np.savetxt('moR.dat',moR)
 
     """ don't know how to pickle
