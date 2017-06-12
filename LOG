@@ -14,3 +14,7 @@ Jun 9
 ----
 4. run bcc-2 using pyscf
 alat = 3.77945227
+
+Jun 12
+----
+5. create hdf5
