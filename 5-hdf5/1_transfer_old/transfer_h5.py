@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import numpy as np
+import pandas as pd
 import h5py
 from pwscf_h5 import PwscfH5
 
@@ -10,13 +11,15 @@ if __name__ == '__main__':
     ref = PwscfH5()
     ref.read(ref_fname)
     gvec = ref.get('gvectors')
-    nkpt = int(ref.get('nkpt'))
+    nkpt0 = ref.get('nkpt')[0]
+    ref_evals = ref.eigenvalues()
+    nkpt,nspin,nstate = ref_evals.shape
+    assert nkpt == nkpt0
     ref_kpts = np.zeros([nkpt,3])
     for ikpt in range(nkpt):
         rkpt = ref.val('electrons/kpoint_%d/reduced_k'%ikpt)
         ref_kpts[ikpt] = rkpt
     # end for
-    ref_evals = ref.eigenvalues()
 
     new_fname = 'from_ref.h5'
     new = h5py.File(new_fname,'w')
@@ -57,43 +60,12 @@ if __name__ == '__main__':
 
     # transfer wavefunction data
     # ====
+    ref.create_electrons_group(new,gvec,ref.eigensystem())
 
     # transfer orbital info.
     new.create_dataset('electrons/number_of_electrons',data=[1,1])
     new.create_dataset('electrons/number_of_kpoints',data=[8])
     new.create_dataset('electrons/number_of_spins',data=[1])
     new.create_dataset('electrons/psi_r_is_complex',data=[1])
-
-    # transfer orbitals (electrons group)
-    for ikpt in range(8): 
-        kpt_path = 'electrons/kpoint_%d'%ikpt
-        kgrp = new.create_group(kpt_path)
-        kgrp.create_dataset('num_sym',data=[1])
-        kgrp.create_dataset('symgroup',data=[1])
-        kgrp.create_dataset('weight',data=[0.25])
-        kgrp.create_dataset('reduced_k',data=ref_kpts[ikpt])
-        if ikpt == 0:
-            kgrp.create_dataset('gvectors',data=gvec)
-            kgrp.create_dataset('number_of_gvectors',data=[len(gvec)])
-        # end if 
-
-        for ispin in range(1): # assume ispin==0
-            spin_path = os.path.join(kpt_path,'spin_%d'%ispin)
-            spgrp = new.create_group(spin_path)
-            spgrp.create_dataset('number_of_states',data=[5]) # !!!! hard-code
-            spgrp.create_dataset('eigenvalues',data=ref_evals[ikpt,ispin])
-        
-            for istate in range(4):
-                loc = {'ikpt':ikpt,'ispin':ispin,'istate':istate}
-                state_path = os.path.join(spin_path,'state_%d'%istate)
-
-                # read, separate loop later
-                psig_arr = ref.psig(**loc)
-
-                # write
-                psig_path = os.path.join(state_path,'psi_g')
-                new.create_dataset(psig_path,data=psig_arr)
-            # end for
-    # end for
 
 # end __main__
