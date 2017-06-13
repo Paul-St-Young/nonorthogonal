@@ -41,14 +41,14 @@ if __name__ == '__main__':
 
     from ase.build import bulk
     ase_atom = bulk('H','bcc',a=3.77945227,cubic=True)
-    cell = build_cell(ase_atom,basis='cc-pVDZ')
-    test = run_kdft(cell,nmp=[4,4,4],gamma=True)
+    cell = build_cell(ase_atom,basis='cc-pVDZ',ke=20)
+    #test = run_kdft(cell,nmp=[4,4,4],gamma=True)
 
-    from pyscf.pbc.dft import gen_grid
-    coords = gen_grid.gen_uniform_grids(test.cell)
-    aoR = test._numint.eval_ao(cell,coords)[0]
+    #from pyscf.pbc.dft import gen_grid
+    #coords = gen_grid.gen_uniform_grids(test.cell)
+    #aoR = test._numint.eval_ao(cell,coords)[0]
 
-    np.savetxt('aoR.dat',aoR)
+    #np.savetxt('aoR.dat',aoR)
 
     """
     coeff = test.mo_coeff

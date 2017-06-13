@@ -1,0 +1,7 @@
+converstion:
+  step1 write /supercell and /atoms using pyscf.pbc.gto.cell
+    check by inspection of the pwscf.pwscf.h5 file
+  step2 read eigensystem from pyscf.pbc.dft object
+    check by compairing psir with moR
+  step3 write eigensystem to pwscf.pwscf.h5 file
+    check by 1_transfer_old

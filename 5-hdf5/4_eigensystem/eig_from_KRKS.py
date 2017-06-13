@@ -10,7 +10,9 @@ from system_from_cell import bcc2
 sys.path.insert(0,'../3_gvec')
 from ecut import gvectors_within_cutoff
 
-def eigensystem_from_pyscf(kmf,rkpts,abs_kpts):
+def eigensystem_from_pyscf(kmf,rkpts,abs_kpts,axes):
+    # axes only used to get volumn
+    vol = np.dot(np.cross(axes[0],axes[1]),axes[2])
     nkpt  = len(rkpts)
     nspin = 1 # !!!! assume same orbitals for up and down e-
     data  = []
@@ -18,10 +20,13 @@ def eigensystem_from_pyscf(kmf,rkpts,abs_kpts):
       for ispin in range(nspin): 
         evalues,evectors = kmf.get_bands(abs_kpts[ikpt])
         nstate = len(evalues)
-        moR = np.dot(aoR,evectors) # put molecular orbitals on real-space grid
+        # normalize eigenvectors
+        nevecs = evectors/np.linalg.norm(evectors,axis=0)
+        moR = np.dot(aoR,nevecs).real # put molecular orbitals on real-space grid
         for istate in range(nstate):
           rgrid = moR[:,istate].reshape(rgrid_shape)
-          moG   = np.fft.fftn(rgrid) # plane-wave coefficients
+          # get plane-wave coefficients
+          moG   = np.fft.fftn(rgrid)/np.prod(rgrid_shape)*vol  
           psig  = np.zeros([len(int_gvecs),2]) # store real & complex
           for igvec in range(len(int_gvecs)):
             comp_val = moG[tuple(int_gvecs[igvec])]
@@ -73,9 +78,8 @@ if __name__ == '__main__':
     # end if
 
     rkpts    = cell.get_scaled_kpts(abs_kpts) # kpoints in crystal units
-    df = eigensystem_from_pyscf(kmf,rkpts,abs_kpts)
+    df = eigensystem_from_pyscf(kmf,rkpts,abs_kpts,axes)
     df.reset_index().to_json('mydf.json')
-
 
     """
     import h5py
