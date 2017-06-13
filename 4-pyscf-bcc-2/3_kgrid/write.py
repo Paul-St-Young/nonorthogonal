@@ -14,7 +14,7 @@ if __name__ == '__main__':
     with open('data.p','r') as f:
         data = pickle.load(f)
 
-    ikpt = 1
+    ikpt = 0
     abs_kpts = np.loadtxt('abs_kpts.dat')
 
     kvec = abs_kpts[ikpt]
@@ -28,10 +28,10 @@ if __name__ == '__main__':
 
     bloch_shift = np.exp(-1j*(kvec[0]*x+kvec[1]*y+kvec[2]*z))
     """
-    psir = np.absolute( moR[:,0].reshape([nx,nx,nx]) )# * bloch_shift ) # first orbital
+    psir = np.absolute( moR[:,2].reshape([nx,nx,nx]) )# * bloch_shift ) # first orbital
     print psir.min(),psir.max()
 
     fig = plt.figure()
     ax  = fig.add_subplot(111,projection='3d',aspect=1)
-    isosurf(ax,psir,0.2)
+    isosurf(ax,psir)#,0.2)
     plt.show()

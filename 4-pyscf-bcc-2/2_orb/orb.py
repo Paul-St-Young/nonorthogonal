@@ -29,6 +29,8 @@ def build_cell(ase_atom,unit='B',ke=20.0,gsmax=None,basis='cc-pVDZ',
 def run_dft(cell):
     from pyscf.pbc import dft as pbcdft
     sim = pbcdft.RKS(cell)
+    sim.chkfile = 'check1.dat'
+    sim.init_guess = 'check.dat'
     sim.xc = 'lda,lda'
     sim.verbose = 3
     sim.scf()
@@ -39,7 +41,7 @@ if __name__ == '__main__':
 
     from ase.build import bulk
     ase_atom = bulk('H','bcc',a=3.77945227,cubic=True)
-    cell = build_cell(ase_atom,basis='cc-pVDZ')
+    cell = build_cell(ase_atom,basis='cc-pVTZ')
     test = run_dft(cell)
 
     from pyscf.pbc.dft import gen_grid
