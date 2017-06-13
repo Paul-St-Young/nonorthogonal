@@ -2,3 +2,5 @@
 2_orb: extract pyscf orbitals in real space
 3_kgrid: run pyscf on a grid of kpoints
 4_aoR: look at atomic orbitals
+5_moC: look at molecular orbital coefficients
+6_lcao: use np.dot to take linear combination of atomic orbitals (lcao)

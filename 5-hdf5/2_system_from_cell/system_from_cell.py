@@ -27,10 +27,9 @@ def read_atoms(atext):
     return elem,np.array(pos)
 # end def read_atoms
 
-if __name__ == '__main__':
+def bcc2(alat,basis='cc-pVDZ',ke=20.):
 
     # define system
-    alat  = 3.77945227
     axes  = alat*np.eye(3)
     elem  = ['H','H']
     upos  = np.array([[0,0,0],[0.5,0.5,0.5]])
@@ -43,11 +42,18 @@ if __name__ == '__main__':
         a    = axes,
         atom = atext,
         unit = 'B',
-        basis = 'cc-pVDZ',
-        ke_cutoff = 20.,
+        basis = basis,
+        ke_cutoff = ke
     )
-    abs_kpts = cell.make_kpts([2,2,2])        # kpoints in 2pi/alat units
+    return cell
+# end def bcc2
 
+if __name__ == '__main__':
+
+    alat = 3.77945227
+    cell = bcc2(alat)
+
+    abs_kpts = cell.make_kpts([2,2,2])        # kpoints in 2pi/alat units
     rkpts    = cell.get_scaled_kpts(abs_kpts) # kpoints in crystal units
 
     """
