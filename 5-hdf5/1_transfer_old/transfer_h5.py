@@ -60,12 +60,6 @@ if __name__ == '__main__':
 
     # transfer wavefunction data
     # ====
-    ref.create_electrons_group(new,gvec,ref.eigensystem())
-
-    # transfer orbital info.
-    new.create_dataset('electrons/number_of_electrons',data=[1,1])
-    new.create_dataset('electrons/number_of_kpoints',data=[8])
-    new.create_dataset('electrons/number_of_spins',data=[1])
-    new.create_dataset('electrons/psi_r_is_complex',data=[1])
+    ref.create_electrons_group(new,gvec,ref.eigensystem(),[1,1])
 
 # end __main__

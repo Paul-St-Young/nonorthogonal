@@ -29,16 +29,11 @@ if __name__ == '__main__':
     from pwscf_h5 import PwscfH5
     new = h5py.File('pwscf.pwscf.h5','w')
     ref = PwscfH5()
-    ref.system_from_cell(new,cell)
+    nelecs = ref.system_from_cell(new,cell)
 
     eig_df = pd.read_json('../4_eigensystem/mydf.json').set_index(
       ['ikpt','ispin','istate'],drop=True).sort_index()
-    ref.create_electrons_group(new,int_gvecs,eig_df)
-    # transfer orbital info.
-    new.create_dataset('electrons/number_of_electrons',data=[1,1])
-    new.create_dataset('electrons/number_of_kpoints',data=[8])
-    new.create_dataset('electrons/number_of_spins',data=[1])
-    new.create_dataset('electrons/psi_r_is_complex',data=[1])
+    ref.create_electrons_group(new,int_gvecs,eig_df,nelecs)
 
     # transfer version info.
     new.create_dataset('application/code',data=['pyscf'])
