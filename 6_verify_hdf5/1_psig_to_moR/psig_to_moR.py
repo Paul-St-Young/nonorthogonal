@@ -80,7 +80,7 @@ def get_psir(pwscf_h5_fname,ikpt=0,ispin=0,istate=0):
     return psir
 # end def get_psir
 
-def get_pyscf_psir(kmf,ikpt=0,ispin=0,istate=0):
+def get_pyscf_psir(kmf,cell,ikpt=0,ispin=0,istate=0):
     # !!!! ispin is not used for KRKS
     # get molecular orbital
     from pyscf.pbc.dft import gen_grid,numint
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     # define orbital to compare
     loc = {'ikpt':2,'ispin':0,'istate':5}
 
-    psir0 = get_pyscf_psir(kmf,**loc)
+    psir0 = get_pyscf_psir(kmf,cell,**loc)
     val0  = np.absolute(psir0)
     print val0.min(),val0.max()
 
