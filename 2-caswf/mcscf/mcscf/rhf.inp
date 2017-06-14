@@ -1,0 +1,12 @@
+ $contrl coord=unique icharg=0 ispher=1 mult=1 runtyp=energy 
+         scftyp=rhf units=bohr  $end
+ $system mwords=200  $end
+ $basis  gbasis=cct  $end
+ $guess  guess=huckel  $end
+ $det    group=c1  $end
+ $DATA
+A molecule.
+C1
+B 5.00       0.00000000       0.00000000       0.00000000
+H 1.00       2.36223900       0.00000000       0.00000000
+ $END

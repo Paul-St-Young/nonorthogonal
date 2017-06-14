@@ -1,0 +1,7 @@
+1. ref: reproduce qmcpack/test/solid/bcc/qmc_short_vmc_dmc at gamma
+2. kgrid4: be able to twist average
+3. psir: write_psir=True
+4. convert: try to convert
+
+3.1 small_ecut: psir with reduced ecut
+4.1 small_convert: convert using small_ecut

@@ -5,9 +5,11 @@ from nexus import PwscfInput
 from nexus import generate_pwscf,generate_pw2qmcpack,generate_qmcpack
 
 if __name__ == '__main__':
+    ecut   = 60
+    rundir = 'ecut%d' % ecut
 
     settings(
-        runs       = 'default',
+        runs       = rundir,
         pseudo_dir = '/home/yyang173/Desktop/phases/pseudo',
         machine    = 'ws16',
         generate_only = 0,
@@ -32,7 +34,7 @@ if __name__ == '__main__':
         occupations= 'smearing',
         smearing   = 'f-d',
         degauss    = 1e-4,#0.0019, # 300 K, close enough to zero
-        ecut       = 500, #20,
+        ecut       = ecut,
         input_dft  = 'lda',
         system     = system,
         job        = scf_job,
