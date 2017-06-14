@@ -1,6 +1,9 @@
 2017
 ====
 
+most important folders:
+6-verify_hdf5/2_no_ecut_hdf5
+
 Jun 7
 ----
 1. Map building and calling of EinspleinSet and LCOrbitalSet

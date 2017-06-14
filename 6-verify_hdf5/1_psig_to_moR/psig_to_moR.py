@@ -23,7 +23,7 @@ def psig_to_psir(gvecs,psig,rgrid_shape,vol):
     return rgrid
 # end def psig_to_psir
 
-def simulate_bcc2(alat=3.77945227,basis='cc-pVDZ',ke=20.,kgrid=[2,2,2],chkfile='pvdz.h5'):
+def simulate_bcc2(alat=3.77945227,basis='cc-pVDZ',ke=20.,kgrid=[2,2,2],chkfile='pvdz.h5',from_scratch=False):
   import os
   import pyscf.pbc.gto as pbcgto
   import pyscf.pbc.dft as pbcdft
@@ -43,7 +43,7 @@ def simulate_bcc2(alat=3.77945227,basis='cc-pVDZ',ke=20.,kgrid=[2,2,2],chkfile='
   # define simulation
   abs_kpts = cell.make_kpts(kgrid)
   kmf = pbcdft.KRKS(cell,abs_kpts)
-  if os.path.isfile(chkfile):
+  if os.path.isfile(chkfile) and (not from_scratch):
     from pyscf.pbc import lib
     kmf.__dict__.update(lib.chkfile.load(chkfile,'scf'))
   else:

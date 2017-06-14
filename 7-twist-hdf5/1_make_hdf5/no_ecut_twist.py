@@ -4,12 +4,13 @@ import numpy as np
 import pandas as pd
 
 import sys
-sys.path.insert(0,'../1_psig_to_moR')
+sys.path.insert(0,'../../6-verify_hdf5/1_psig_to_moR')
 from psig_to_moR import simulate_bcc2
 
 def no_ecut_from_pyscf(kmf,cell,kgrid):
 
     # generate gvectors (no ke_cutoff)
+    axes = cell.a
     nx,ny,nz = cell.gs
     from itertools import product
     int_gvecs = np.array([gvec for gvec in product(
@@ -30,26 +31,31 @@ def no_ecut_from_pyscf(kmf,cell,kgrid):
     data  = []
     for ikpt in range(nkpt):
       for ispin in range(nspin):
+        istate = ikpt # !!!! fake all k-points into gamma as different states
+
+        # build e^ikr at this kpoint
+        kvec = abs_kpts[ikpt]
+        eik_dot_r = np.fft.fftshift( np.zeros(rgrid_shape,dtype=complex) )
+        for ix,iy,iz in product(range(-nx,nx+1),range(-ny,ny+1),range(-nz,nz+1)):
+          rvec = np.dot([ix,iy,iz],axes)
+          eik_dot_r[ix,iy,iz] = np.exp(1j*np.dot(kvec,rvec))
+
         # get eigensystem
-        evalues  = kmf.mo_energy[ikpt]
         evectors = kmf.mo_coeff[ikpt]#.get_bands(abs_kpts[ikpt])
-        assert evalues.shape == (10,)
         assert evectors.shape== (10,10)
-        nstate = len(evalues)
         moR = np.dot(aoR,evectors).real # put molecular orbitals on real-space grid
-        for istate in range(nstate):
-          rgrid = moR[:,istate].reshape(rgrid_shape)
-          # get plane-wave coefficients
-          moG   = np.fft.fftn(rgrid)/np.prod(rgrid_shape)*cell.vol
-          psig  = np.zeros([len(int_gvecs),2]) # store real & complex
-          for igvec in range(len(int_gvecs)):
-            comp_val = moG[tuple(int_gvecs[igvec])]
-            psig[igvec,:] = comp_val.real,comp_val.imag
-          # end for igvec
-          entry = {'ikpt':ikpt,'ispin':ispin,'istate':istate,
-            'reduced_k':rkpts[ikpt],'evalue':evalues[istate],'evector':psig}
-          data.append(entry)
-        # end for istate
+
+        rgrid = moR[:,0].reshape(rgrid_shape) # !!!! use the occupied state at each kpoint
+        # get plane-wave coefficients
+        moG   = np.fft.fftn(rgrid)/np.prod(rgrid_shape)*cell.vol * eik_dot_r
+        psig  = np.zeros([len(int_gvecs),2]) # store real & complex
+        for igvec in range(len(int_gvecs)):
+          comp_val = moG[tuple(int_gvecs[igvec])]
+          psig[igvec,:] = comp_val.real,comp_val.imag
+        # end for igvec
+        entry = {'ikpt':0,'ispin':ispin,'istate':istate, # !!!! store at gamma
+          'reduced_k':rkpts[0],'evalue':istate,'evector':psig}
+        data.append(entry)
       # end for ispin
     # end for ikpt
     import pandas as pd
@@ -60,8 +66,8 @@ def no_ecut_from_pyscf(kmf,cell,kgrid):
 def main():
   # run DFT
   kgrid = [2,2,2]
-  cell,kmf = simulate_bcc2(alat=3.77945227, basis='cc-pVDZ',chkfile='pvdz.h5'
-    ,ke=20.,kgrid=kgrid)
+  cell,kmf = simulate_bcc2(
+    alat=3.77945227, basis='cc-pVDZ',chkfile='pvdz.h5',ke=20.,kgrid=kgrid)
 
   # read eigensystem
   fname = 'eigensystem.json'
