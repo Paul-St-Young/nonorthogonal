@@ -99,6 +99,7 @@ ENV/
 
 # mypy
 .mypy_cache/
+*.p # pickle
 
 # nexus
 results/
@@ -106,3 +107,7 @@ results/
 # data
 *.dat
 *.h5
+*.ipynb
+
+# vim
+.*.swp
