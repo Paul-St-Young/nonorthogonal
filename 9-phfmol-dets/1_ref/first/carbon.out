@@ -1,0 +1,113 @@
+<pyscf.pbc.gto.cell.Cell object at 0x2aab065f6190>
+
+INFO: **** input file is /p/lscratchh/yang41/first/carbon.py ****
+#!/usr/bin/env python
+
+import h5py
+import numpy
+from functools import reduce
+import lib
+from pbc import gto, scf, dft
+import tools,ao2mo
+
+alat0 = 3.6
+
+cell = gto.Cell()
+cell.h = (numpy.ones((3,3))-numpy.eye(3))*alat0/2.0
+cell.atom = (('C',0,0,0),('C',numpy.array([0.25,0.25,0.25])*alat0))
+cell.basis = 'gth-szv'
+cell.pseudo = 'gth-pade'
+cell.gs = [5]*3  # 10 grids on postive x direction, => 21^3 grids in total
+cell.verbose = 4
+print cell
+cell.build()
+
+mf = scf.RHF(cell,exxdiv=None)#,exxdiv=0)
+#ehf = mf.kernel()
+ehf = mf.scf()
+
+c = mf.mo_coeff
+nmo = c.shape[1]
+h1e = reduce(numpy.dot, (c.T, mf.get_hcore(), c))
+eri = mf.with_df.ao2mo(c)
+eri = ao2mo.restore('s8',eri,nmo)
+tools.fcidump.from_integrals('fcidump.dat', h1e, eri, nmo, cell.nelectron,nuc=cell.energy_nuc(), ms=0)
+
+INFO: ******************** input file end ********************
+
+System: ('Linux', 'quartz2300', '3.10.0-514.10.2.2chaos.ch6.x86_64', '#1 SMP Fri Mar 17 15:45:16 PDT 2017', 'x86_64', 'x86_64')
+Date: Wed Jun 14 16:31:37 2017
+PySCF version 1.2
+PySCF path  /g/g91/yang41/soft/pyscf/pyscf
+[INPUT] VERBOSE 4
+[INPUT] light speed = 137.0359895
+[INPUT] num atoms = 2
+[INPUT] num electrons = 8
+[INPUT] charge = 0
+[INPUT] spin (= nelec alpha-beta = 2S) = 0
+[INPUT]  1 C      0.000000000000   0.000000000000   0.000000000000 AA    0.000000000000   0.000000000000   0.000000000000 Bohr
+[INPUT]  2 C      0.900000000000   0.900000000000   0.900000000000 AA    1.700753512109   1.700753512109   1.700753512109 Bohr
+[INPUT] ---------------- BASIS SET ---------------- 
+[INPUT] l, kappa, [nprim/nctr], expnt,             c_1 c_2 ...
+[INPUT] C
+[INPUT] 0    0    [4    /1   ]  4.3362376436      0.1490797872
+                                1.2881838513      -0.0292640031
+                                0.4037767149      -0.688204051
+                                0.1187877657      -0.3964426906
+[INPUT] 1    0    [4    /1   ]  4.3362376436      -0.0878123619
+                                1.2881838513      -0.27755603
+                                0.4037767149      -0.4712295093
+                                0.1187877657      -0.4058039291
+nuclear repulsion = -12.6692034235303
+number of shells = 4
+number of NR pGTOs = 32
+number of NR cGTOs = 8
+CPU time:         1.29
+lattice vector [a1          | a2          | a3         ]
+               [0.000000000 | 3.401507024 | 3.401507024]
+               [3.401507024 | 0.000000000 | 3.401507024]
+               [3.401507024 | 3.401507024 | 0.000000000]
+Cell volume = 78.7126
+nimgs = [5 5 5]  lattice sum = 515 cells
+precision = 1e-08
+gs (grid size) = [5, 5, 5]
+pseudo = gth-pade
+ke_cutoff = None
+ew_eta = 0.931808
+ew_cut = [2 2 2]
+
+
+******** <class 'pyscf.pbc.scf.hf.RHF'> flags ********
+method = RHF
+initial guess = minao
+damping factor = 0
+level shift factor = 0
+Do DIIS = True
+DIIS start cycle = 1
+DIIS space = 8
+SCF tol = 1e-09
+SCF gradient tol = None
+max. SCF cycles = 50
+direct_scf = False
+chkfile to save SCF result = /var/tmp/yang41/tmpwBL4Yk
+max_memory 4000 MB (current use 158 MB)
+******** PBC SCF flags ********
+kpt = [ 0.  0.  0.]
+DF object = <pyscf.pbc.df.fft.DF object at 0x2aab06c22d90>
+Exchange divergence treatment (exxdiv) = None
+Set gradient conv threshold to 3.16228e-05
+init E= -9.47663080530295
+  HOMO = 0.701771076646573  LUMO = 0.946347970629523
+cycle= 1 E= -7.45661009552342  delta_E= 2.02  |g|= 0.0538  |ddm|= 5.29
+  HOMO = 0.95199446393984  LUMO = 1.13226049897417
+cycle= 2 E= -7.427486940008  delta_E= 0.0291  |g|= 0.281  |ddm|= 0.757
+  HOMO = 0.952641727591941  LUMO = 1.13158427261951
+cycle= 3 E= -7.4576997652319  delta_E= -0.0302  |g|= 0.00183  |ddm|= 0.641
+  HOMO = 0.952680050984823  LUMO = 1.13156549845214
+cycle= 4 E= -7.4577008736671  delta_E= -1.11e-06  |g|= 0.00067  |ddm|= 0.00273
+  HOMO = 0.952702067831571  LUMO = 1.13155471487153
+cycle= 5 E= -7.45770104305433  delta_E= -1.69e-07  |g|= 4.62e-05  |ddm|= 0.00141
+  HOMO = 0.952704609109733  LUMO = 1.13155346793793
+cycle= 6 E= -7.45770104383257  delta_E= -7.78e-10  |g|= 8.94e-06  |ddm|= 0.000124
+  HOMO = 0.952704197122572  LUMO = 1.13155367844258
+converged SCF energy = -7.45770104383257
