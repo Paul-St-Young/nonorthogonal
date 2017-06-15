@@ -14,7 +14,7 @@
 !
 &ham_data
   nbas   = 8,
-  ni2s   = 515,
+  ni2s   = 519,
   fdet = 'phfmol.det',
   fints  = 'fcidump.dat' /
 !
