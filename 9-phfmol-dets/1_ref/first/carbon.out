@@ -1,0 +1,192 @@
+#INFO: **** input file is /p/lscratchh/yang41/9-phfmol-dets/1_ref/first/carbon.py ****
+def atom_text(elem,pos):
+    assert len(elem) == len(pos)
+    lines = []
+    for iatom in range(len(elem)):
+        mypos = pos[iatom]
+        line = '%5s  %10.6f  %10.6f  %10.6f' % (elem[iatom],mypos[0],mypos[1],mypos[2])
+        lines.append(line)
+    atext = ';\n'.join(lines)
+    return atext
+# end def
+
+import os
+import numpy as np
+import pyscf
+from pyscf.pbc import gto,scf
+from pyscf.pbc.scf import RHF
+from pyscf import lib
+
+def run_carbon():
+  basis={
+  'C':pyscf.gto.basis.parse('''
+  C s
+    0.205100 0.397529 
+    0.409924 0.380369 
+    0.819297 0.180113 
+    1.637494 -0.033512 
+    3.272791 -0.121499 
+    6.541187 0.015176 
+    13.073594 -0.000705 
+   C p
+    0.234064 0.302667 
+    0.468003 0.289868 
+    0.935757 0.210979 
+    1.871016 0.112024 
+    3.741035 0.054425 
+    7.480076 0.021931 
+   C d
+    0.329486 1.000000 
+   C f
+    0.773485 1.000000 
+   C s
+  0.2 1.0
+   C s
+  0.6 1.0
+   C p
+  0.2 1.0
+   C p
+  0.6 1.0
+  '''),
+  }
+  alat0 = 3.6 # angstrom?
+  axes  = (np.ones((3,3))-np.eye(3))*alat0/2.0
+  elem  = ['C','C']
+  pos   = np.array([[0,0,0],[0.25,0.25,0.25]])*alat0
+  atoms = atom_text(elem,pos)
+  #basis = 'gth-szv'
+  #pseudo= 'gth-pade'
+  fname = 'vdz.h5'
+
+  cell = gto.M(verbose=4,a=axes,
+    gs=[4,4,4],atom=atoms,basis=basis,pseudo={'C':'bfd'})#pseudo)
+  cell.charge=0
+  mf = RHF(cell,exxdiv=None)
+  mf.max_cycle=50
+  mf.chkfile=fname
+  mf.conv_tol=1e-07
+  mf.diis_start_cycle=1
+
+  # run or load
+  if os.path.isfile(fname):
+    mf.__dict__.update(lib.chkfile.load(fname,'scf'))
+  else:
+    mf.scf()
+  return mf
+# end def run_carbon
+
+if __name__ == '__main__':
+
+  mf = run_carbon()
+  c = mf.mo_coeff
+  nmo = c.shape[1]
+  h1e = reduce(np.dot, (c.T, mf.get_hcore(), c)) # 1-electron integrals
+  eri = mf.with_df.ao2mo(c) # 2-electron integrals
+  eri = ao2mo.restore('s8',eri,nmo) # use 8-fold symmetry of integrals of real orbitals [ij|kl] = [kj|il\ etc.
+  tools.fcidump.from_integrals('fcidump.dat', 
+    h1e, eri, nmo, cell.nelectron,nuc=cell.energy_nuc(), ms=0)
+
+# end __main__
+#INFO: ******************** input file end ********************
+
+
+System: ('Linux', 'quartz285', '3.10.0-514.10.2.2chaos.ch6.x86_64', '#1 SMP Fri Mar 17 15:45:16 PDT 2017', 'x86_64', 'x86_64')  Threads 72
+Python 2.7.13 (default, Jan  3 2017, 11:21:42) 
+[GCC 4.8.5 20150623 (Red Hat 4.8.5-11)]
+numpy 1.11.2  scipy 0.18.1
+Date: Fri Jun 16 16:24:26 2017
+PySCF version 1.4a
+PySCF path  /g/g91/yang41/soft/pyscf/pyscf
+[INPUT] VERBOSE 4
+[INPUT] num atoms = 2
+[INPUT] num electrons = 8
+[INPUT] charge = 0
+[INPUT] spin (= nelec alpha-beta = 2S) = 0
+[INPUT] symmetry False subgroup None
+[INPUT]  1 C      0.000000000000   0.000000000000   0.000000000000 AA    0.000000000000   0.000000000000   0.000000000000 Bohr
+[INPUT]  2 C      0.900000000000   0.900000000000   0.900000000000 AA    1.700753512109   1.700753512109   1.700753512109 Bohr
+[INPUT] ---------------- BASIS SET ---------------- 
+[INPUT] l, kappa, [nprim/nctr], expnt,             c_1 c_2 ...
+[INPUT] C
+[INPUT] 0    0    [7    /1   ]  0.2051            0.397529
+                                0.409924          0.380369
+                                0.819297          0.180113
+                                1.637494          -0.033512
+                                3.272791          -0.121499
+                                6.541187          0.015176
+                                13.073594         -0.000705
+[INPUT] 0    0    [1    /1   ]  0.2                  1
+[INPUT] 0    0    [1    /1   ]  0.6                  1
+[INPUT] 1    0    [6    /1   ]  0.234064          0.302667
+                                0.468003          0.289868
+                                0.935757          0.210979
+                                1.871016          0.112024
+                                3.741035          0.054425
+                                7.480076          0.021931
+[INPUT] 1    0    [1    /1   ]  0.2                  1
+[INPUT] 1    0    [1    /1   ]  0.6                  1
+[INPUT] 2    0    [1    /1   ]  0.329486             1
+[INPUT] 3    0    [1    /1   ]  0.773485             1
+nuclear repulsion = -12.6692033990629
+number of shells = 16
+number of NR pGTOs = 90
+number of NR cGTOs = 48
+basis = {'C': [[0, [0.2051, 0.397529], [0.409924, 0.380369], [0.819297, 0.180113], [1.637494, -0.033512], [3.272791, -0.121499], [6.541187, 0.015176], [13.073594, -0.000705]], [0, [0.2, 1.0]], [0, [0.6, 1.0]], [1, [0.234064, 0.302667], [0.468003, 0.289868], [0.935757, 0.210979], [1.871016, 0.112024], [3.741035, 0.054425], [7.480076, 0.021931]], [1, [0.2, 1.0]], [1, [0.6, 1.0]], [2, [0.329486, 1.0]], [3, [0.773485, 1.0]]]}
+ecp = {'C': 'bfd'}
+CPU time:         5.06
+lattice vectors  a1 [0.000000000, 3.401507024, 3.401507024]
+                 a2 [3.401507024, 0.000000000, 3.401507024]
+                 a3 [3.401507024, 3.401507024, 0.000000000]
+dimension = 3
+Cell volume = 78.7126
+rcut = 15.1005653466 (nimgs = [4 4 4])
+lattice sum = 527 cells
+precision = 1e-08
+pseudo = {}
+gs (FFT-mesh) = [4, 4, 4]
+    = ke_cutoff [ 20.4723757  20.4723757  20.4723757]
+ew_eta = 0.644226
+ew_cut = 9.42171232094 (nimgs = [3 3 3])
+
+
+******** <class 'pyscf.pbc.scf.hf.RHF'> flags ********
+method = RHF
+initial guess = minao
+damping factor = 0
+level shift factor = 0
+DIIS = <pyscf.scf.diis.CDIIS object at 0x2aaab0e3e7d0>
+DIIS start cycle = 1
+DIIS space = 8
+SCF tol = 1e-07
+SCF gradient tol = None
+max. SCF cycles = 50
+direct_scf = False
+chkfile to save SCF result = vdz.h5
+max_memory 4000 MB (current use 54 MB)
+******** PBC SCF flags ********
+kpt = [ 0.  0.  0.]
+DF object = <pyscf.pbc.df.fft.FFTDF object at 0x2aab0c794ed0>
+Exchange divergence treatment (exxdiv) = None
+Set gradient conv threshold to 0.000316228
+init E= -8.81810759802399
+  HOMO = 0.706545632424975  LUMO = 0.897492383467196
+cycle= 1 E= -7.49184911631472  delta_E= 1.33  |g|= 0.914  |ddm|= 19.5
+  HOMO = 0.887725425395765  LUMO = 1.08212471186373
+cycle= 2 E= -6.52843759053198  delta_E= 0.963  |g|= 1.69  |ddm|= 6.25
+  HOMO = 0.929218388898127  LUMO = 1.04915633426424
+cycle= 3 E= -7.61482429386615  delta_E= -1.09  |g|= 0.442  |ddm|=  5.8
+  HOMO = 0.916257983866681  LUMO = 1.03250662840221
+cycle= 4 E= -7.66451548723061  delta_E= -0.0497  |g|= 0.195  |ddm|= 0.73
+  HOMO = 0.922898195452665  LUMO = 1.03005014681188
+cycle= 5 E= -7.67523959704439  delta_E= -0.0107  |g|= 0.00901  |ddm|= 0.392
+  HOMO = 0.921783716649195  LUMO = 1.02969646324011
+cycle= 6 E= -7.67526009601393  delta_E= -2.05e-05  |g|= 0.00359  |ddm|= 0.0636
+  HOMO = 0.921605064449538  LUMO = 1.02960954612589
+cycle= 7 E= -7.67526323032725  delta_E= -3.13e-06  |g|= 0.00155  |ddm|= 0.0144
+  HOMO = 0.921627479750664  LUMO = 1.02960066200834
+cycle= 8 E= -7.67526390928337  delta_E= -6.79e-07  |g|= 0.00018  |ddm|= 0.00427
+  HOMO = 0.921632470079886  LUMO = 1.02960364191888
+cycle= 9 E= -7.6752639190804  delta_E= -9.8e-09  |g|= 1.12e-05  |ddm|= 0.000415
+  HOMO = 0.921632541930416  LUMO = 1.02960307480789
+Extra cycle  E= -7.67526391855184  delta_E= 5.29e-10  |g|= 1.12e-05  |ddm|= 0.000151
+converged SCF energy = -7.67526391855184
