@@ -50,8 +50,11 @@ def main():
 
     ci_coeff = np.loadtxt('../1_ref/ci_coeff.dat').view(complex)
     detlist  = np.loadtxt('../1_ref/detlist.dat').view(complex)
-    ndet = len(detlist)
-    assert len(ci_coeff) == ndet
+    ndet = len(ci_coeff)
+    if ndet == 1: # single-determinant
+      detlist = detlist.reshape(1,len(detlist))
+    # end if
+    assert detlist.shape[0] == ndet
     assert detlist.shape[1] == nao*nao
 
     eig_fname = 'eigsys.json'
@@ -71,7 +74,8 @@ def main():
     data = []
     for idet in range(ndet):
       det = detlist[idet].reshape(nao,nao)
-      moR = np.dot(aoR,det)
+      mo_coeff = np.dot(mf.mo_coeff,det)
+      moR = np.dot(aoR,mo_coeff)
       for iorb in range(nfill):
         rgrid = moR[:,iorb].reshape(rgrid_shape)
         moG   = np.fft.fftn(rgrid)/np.prod(rgrid_shape)*mf.cell.vol
