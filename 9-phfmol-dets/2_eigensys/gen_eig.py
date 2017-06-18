@@ -5,38 +5,9 @@ import pandas as pd
 from pyscf import lib
 from pyscf.pbc import gto, scf
 
-def atom_text(elem,pos):
-    assert len(elem) == len(pos)
-    lines = []
-    for iatom in range(len(elem)):
-        mypos = pos[iatom]
-        line = '%5s  %10.6f  %10.6f  %10.6f' % (elem[iatom],mypos[0],mypos[1],mypos[2])
-        lines.append(line)
-    atext = ';\n'.join(lines)
-    return atext
-# end def
-
-def run_carbon():
-    alat0 = 3.6 # angstrom?
-    axes  = (np.ones((3,3))-np.eye(3))*alat0/2.0
-    elem  = ['C','C']
-    pos   = np.array([[0,0,0],[0.25,0.25,0.25]])*alat0
-    atoms = atom_text(elem,pos)
-    fname = 'szv.h5'
-
-    cell = gto.Cell()
-    cell.build(a=axes,atom=atoms,basis='gth-szv',pseudo='gth-pade'
-      ,gs=np.array([5]*3), verbose=3)
-
-    mf = scf.RHF(cell,exxdiv=None)
-    if os.path.isfile(fname):
-      mf.__dict__.update(lib.chkfile.load(fname,'scf'))
-    else:
-      mf.chkfile = fname
-      mf.scf()
-    # end if
-    return mf
-# end def
+import sys
+sys.path.insert(0,'../1_ref/first/')
+from carbon import run_carbon
 
 def main():
     mf = run_carbon()
@@ -45,7 +16,7 @@ def main():
     coords = gen_grid.gen_uniform_grids(mf.cell)
     aoR = numint.eval_ao(mf.cell,coords)
     nao = aoR.shape[1]
-    rgrid_shape = 2*mf.cell.gs+1
+    rgrid_shape = 2*np.array(mf.cell.gs)+1
     assert np.prod(rgrid_shape)==aoR.shape[0]
 
     ci_coeff = np.loadtxt('../1_ref/ci_coeff.dat').view(complex)
@@ -68,7 +39,7 @@ def main():
     npw = len(int_gvecs)
 
     # turn detlist into a dataframe containing the eigensystem
-    nfill = 4 # 4 filled orbitals
+    nfill = 4 # !!!! hard-code 4 filled orbitals
     ikpt=ispin=0 # only do this for RHF wavefunction at Gamma
     
     data = []

@@ -89,8 +89,13 @@ def check_psir_psig(loc,wf,gvec):
 # def
 
 if __name__ == '__main__':
-    # 3D image
 
+    # inputs
+    visualize = False
+    vkpt   = 1
+    vstate = 0
+
+    # 3D image
     wf = PwscfH5()
     wf.read('pwscf.pwscf.h5')
     gvec = wf.get('gvectors')
@@ -98,12 +103,12 @@ if __name__ == '__main__':
     # read orbital
     for ikpt in range(8):
         for istate in range(4):
+            print ikpt,istate
             loc = {'ikpt':ikpt,'ispin':0,'istate':istate}
 
             pair = check_psir_psig(loc,wf,gvec)
 
-            #"""
-            if (ikpt==1) and (istate==0):
+            if (visualize) and (ikpt==vkpt) and (istate==vstate):
                 # check visually
 
                 val  = np.absolute(pair[0])
@@ -119,6 +124,7 @@ if __name__ == '__main__':
                 plt.show()
                 break
             # end if
-            #"""
+        # end for istate
+    # end for ikpt
 
 # end __main__
