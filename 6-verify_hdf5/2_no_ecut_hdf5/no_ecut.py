@@ -3,10 +3,6 @@ import os
 import numpy as np
 import pandas as pd
 
-import sys
-sys.path.insert(0,'../1_psig_to_moR')
-from psig_to_moR import simulate_bcc2
-
 def no_ecut_from_pyscf(kmf,cell,kgrid):
 
     # generate gvectors (no ke_cutoff)
@@ -19,7 +15,7 @@ def no_ecut_from_pyscf(kmf,cell,kgrid):
     from pyscf.pbc.dft import gen_grid,numint
     coords = gen_grid.gen_uniform_grids(cell)
     aoR    = numint.eval_ao(cell,coords)
-    rgrid_shape = 2*cell.gs+1
+    rgrid_shape = 2*np.array(cell.gs)+1
     assert np.prod(rgrid_shape)==aoR.shape[0]
 
     # go through desired kpoints
@@ -33,6 +29,7 @@ def no_ecut_from_pyscf(kmf,cell,kgrid):
         # get eigensystem
         evalues  = kmf.mo_energy[ikpt]
         evectors = kmf.mo_coeff[ikpt]#.get_bands(abs_kpts[ikpt])
+        print evalues.shape
         assert evalues.shape == (10,)
         assert evectors.shape== (10,10)
         nstate = len(evalues)
@@ -59,6 +56,9 @@ def no_ecut_from_pyscf(kmf,cell,kgrid):
 
 def main():
   # run DFT
+  import sys
+  sys.path.insert(0,'../1_psig_to_moR')
+  from psig_to_moR import simulate_bcc2
   kgrid = [2,2,2]
   cell,kmf = simulate_bcc2(alat=3.77945227, basis='cc-pVDZ',chkfile='pvdz.h5'
     ,ke=20.,kgrid=kgrid)
