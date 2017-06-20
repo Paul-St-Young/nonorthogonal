@@ -82,10 +82,10 @@ def run_carbon(chkfile_name='vdz.h5'):
   return mf
 # end def run_carbon
 
-def ao_on_grid(mf):
+def ao_on_grid(cell):
   from pyscf.pbc.dft import gen_grid,numint
-  coords = gen_grid.gen_uniform_grids(mf.cell)
-  aoR    = numint.eval_ao(mf.cell,coords)
+  coords = gen_grid.gen_uniform_grids(cell)
+  aoR    = numint.eval_ao(cell,coords)
   return aoR
 # end def ao_on_grid
 
@@ -105,7 +105,9 @@ def mo_coeff_to_psig(mo_coeff,aoR,cell_gs,cell_vol,int_gvecs=None):
     nx,ny,nz = cell_gs
     from itertools import product
     int_gvecs = np.array([gvec for gvec in product(
-      range(-nx,nx+1),range(-ny,ny+1),range(-nz,nz+1))])
+      range(-nx,nx+1),range(-ny,ny+1),range(-nz,nz+1))],dtype=int)
+  else:
+    assert (int_gvecs.dtype is int)
   # end if
   npw = len(int_gvecs) # number of plane waves 
 
@@ -138,7 +140,7 @@ if __name__ == '__main__':
   mf = run_carbon()
 
   # put AO on real-space grid
-  aoR = ao_on_grid(mf)
+  aoR = ao_on_grid(mf.cell)
   
   # put MOs in file for PwscfH5 to read
   import pandas as pd
