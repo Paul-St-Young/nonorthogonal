@@ -52,17 +52,15 @@ def build_carbon_cell():#basis={'C':'gth-szv'},pseudo={'C':'gth-pade'}):
   '''),
   }
   pseudo = {'C':'bfd'}
-  #basis = 'gth-svz'
-  #pseudo= 'gth-pade'
   alat0 = 3.6 # angstrom
   axes  = (np.ones((3,3))-np.eye(3))*alat0/2.0
   elem  = ['C','C']
   pos   = np.array([[0,0,0],[0.25,0.25,0.25]])*alat0
   atoms = atom_text(elem,pos)
-  basis = 'gth-szv'
-  pseudo= 'gth-pade'
+  #basis = 'gth-szv'
+  #pseudo= 'gth-pade'
 
-  cell = gto.M(verbose=3,a=axes,
+  cell = gto.M(verbose=4,a=axes,
     gs=[4,4,4],atom=atoms,basis=basis,pseudo=pseudo)
   cell.charge=0
   return cell

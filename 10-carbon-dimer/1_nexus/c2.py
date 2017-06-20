@@ -10,7 +10,7 @@ from nexus import ProjectManager
 if __name__ == '__main__':
   # machine settings
   settings(
-    runs    = 'default',
+    runs    = 'gamma',
     machine = 'ws16',
     pseudo_dir = './pseudo'
   )
@@ -35,8 +35,12 @@ if __name__ == '__main__':
 
   # simulation parameters
   ecut   = 20
-  kgrid0 = [2,2,2]
-  kgrid  = [2,2,2]
+  #kgrid0 = [2,2,2]
+  #kgrid  = [2,2,2]
+  kgrid0 = [1,1,1]
+  kshift0= [0,0,0]
+  kgrid  = [1,1,1]
+  kshift = [0,0,0]
 
   system = generate_physical_system(
     structure = structure,
@@ -56,6 +60,7 @@ if __name__ == '__main__':
         system    = system.copy(),
         pseudos   = ['C.BFD.upf'],
         kgrid     = kgrid0,
+        kshift    = kshift0,
         job       = scf_job,
         ecut      = ecut
       )
