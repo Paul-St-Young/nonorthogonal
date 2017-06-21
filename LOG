@@ -44,3 +44,8 @@ June 20
 ----
 12. diamond carbon single determinant
 13. redo bcc-2 at gamma
+
+June 21
+----
+14. run PBE in pyscf
+15. pyscf2qmcpack
