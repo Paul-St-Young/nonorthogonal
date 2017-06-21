@@ -85,6 +85,7 @@ if __name__ == '__main__':
   # run pyscf and extract Kohn-Sham eigensystem
   # ================================================
   mean_field_object = run_carbon(verbose=3)
+  print(mean_field_object.e_tot)
 
   from pyscf_orbital_routines import save_eigensystem
   gvecs, eig_df = save_eigensystem(mean_field_object,save=False)
