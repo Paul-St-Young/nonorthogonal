@@ -32,7 +32,7 @@ if __name__ == '__main__':
     overlap = np.sum(val*val1)/np.sqrt(np.sum(val*val)*np.sum(val1*val1))
     print istate,overlap
 
-    if overlap < 0.7:
+    if overlap < 0.9:
       import matplotlib.pyplot as plt
       fig = plt.figure()
       ax  = fig.add_subplot(121,projection='3d',aspect=1)

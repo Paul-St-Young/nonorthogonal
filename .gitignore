@@ -108,6 +108,10 @@ results/
 *.dat
 *.h5
 *.ipynb
+*.json
 
 # vim
 .*.swp
+
+# qmcpack
+*.xml
