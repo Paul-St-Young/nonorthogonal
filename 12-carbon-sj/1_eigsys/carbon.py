@@ -117,7 +117,6 @@ def mo_coeff_to_psig(mo_coeff,aoR,cell_gs,cell_vol,int_gvecs=None):
   rgrid_shape = 2*np.array(cell_gs)+1
   assert nao == np.prod(rgrid_shape)
 
-  # sort MOs from lowest to highest energy
   # for each MO, FFT to get psig
   psig = np.zeros([nmo,npw,2]) # store real & complex
   for istate in range(nmo):
