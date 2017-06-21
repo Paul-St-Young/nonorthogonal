@@ -1,3 +1,4 @@
+#INFO: **** input file is 12-carbon-sj/1_eigsys/carbon.py ****
 #!/usr/bin/env python
 def atom_text(elem,pos):
     assert len(elem) == len(pos)
@@ -177,3 +178,104 @@ if __name__ == '__main__':
   """
 
 # end __main__
+#INFO: ******************** input file end ********************
+
+
+System: ('Linux', 'kylin.physics.illinois.edu', '4.7.7-200.fc24.x86_64', '#1 SMP Sat Oct 8 00:21:59 UTC 2016', 'x86_64', 'x86_64')  Threads 24
+Python 2.7.12 (default, Sep 29 2016, 13:30:34) 
+[GCC 6.2.1 20160916 (Red Hat 6.2.1-2)]
+numpy 1.12.1  scipy 0.19.0
+Date: Wed Jun 21 00:00:19 2017
+PySCF version 1.4a
+[INPUT] VERBOSE 4
+[INPUT] num atoms = 2
+[INPUT] num electrons = 8
+[INPUT] charge = 0
+[INPUT] spin (= nelec alpha-beta = 2S) = 0
+[INPUT] symmetry False subgroup None
+[INPUT]  1 C      0.000000000000   0.000000000000   0.000000000000 AA    0.000000000000   0.000000000000   0.000000000000 Bohr
+[INPUT]  2 C      0.900000000000   0.900000000000   0.900000000000 AA    1.700753512109   1.700753512109   1.700753512109 Bohr
+[INPUT] ---------------- BASIS SET ---------------- 
+[INPUT] l, kappa, [nprim/nctr], expnt,             c_1 c_2 ...
+[INPUT] C
+[INPUT] 0    0    [7    /1   ]  0.2051            0.397529
+                                0.409924          0.380369
+                                0.819297          0.180113
+                                1.637494          -0.033512
+                                3.272791          -0.121499
+                                6.541187          0.015176
+                                13.073594         -0.000705
+[INPUT] 0    0    [1    /1   ]  0.2                  1
+[INPUT] 0    0    [1    /1   ]  0.6                  1
+[INPUT] 1    0    [6    /1   ]  0.234064          0.302667
+                                0.468003          0.289868
+                                0.935757          0.210979
+                                1.871016          0.112024
+                                3.741035          0.054425
+                                7.480076          0.021931
+[INPUT] 1    0    [1    /1   ]  0.2                  1
+[INPUT] 1    0    [1    /1   ]  0.6                  1
+[INPUT] 2    0    [1    /1   ]  0.329486             1
+[INPUT] 3    0    [1    /1   ]  0.773485             1
+nuclear repulsion = -12.6692033990629
+number of shells = 16
+number of NR pGTOs = 90
+number of NR cGTOs = 48
+basis = {'C': [[0, [0.2051, 0.397529], [0.409924, 0.380369], [0.819297, 0.180113], [1.637494, -0.033512], [3.272791, -0.121499], [6.541187, 0.015176], [13.073594, -0.000705]], [0, [0.2, 1.0]], [0, [0.6, 1.0]], [1, [0.234064, 0.302667], [0.468003, 0.289868], [0.935757, 0.210979], [1.871016, 0.112024], [3.741035, 0.054425], [7.480076, 0.021931]], [1, [0.2, 1.0]], [1, [0.6, 1.0]], [2, [0.329486, 1.0]], [3, [0.773485, 1.0]]]}
+ecp = {'C': 'bfd'}
+CPU time:         2.65
+lattice vectors  a1 [0.000000000, 3.401507024, 3.401507024]
+                 a2 [3.401507024, 0.000000000, 3.401507024]
+                 a3 [3.401507024, 3.401507024, 0.000000000]
+dimension = 3
+Cell volume = 78.7126
+rcut = 15.1005653466 (nimgs = [4 4 4])
+lattice sum = 527 cells
+precision = 1e-08
+pseudo = {}
+gs (FFT-mesh) = [4, 4, 4]
+    = ke_cutoff [ 20.4723757  20.4723757  20.4723757]
+ew_eta = 0.644226
+ew_cut = 9.42171232094 (nimgs = [3 3 3])
+
+
+******** <class 'pyscf.pbc.scf.hf.RHF'> flags ********
+method = RHF
+initial guess = minao
+damping factor = 0
+level shift factor = 0
+DIIS = <pyscf.scf.diis.CDIIS object at 0x7f606d1c4250>
+DIIS start cycle = 1
+DIIS space = 8
+SCF tol = 1e-07
+SCF gradient tol = None
+max. SCF cycles = 50
+direct_scf = False
+chkfile to save SCF result = vdz.h5
+max_memory 4000 MB (current use 64 MB)
+******** PBC SCF flags ********
+kpt = [ 0.  0.  0.]
+DF object = <pyscf.pbc.df.fft.FFTDF object at 0x7f60b6a27a10>
+Exchange divergence treatment (exxdiv) = ewald
+Set gradient conv threshold to 0.000316228
+init E= -16.594339064081
+  HOMO = 0.558221747199629  LUMO = 0.788526510520397
+cycle= 1 E= -10.2423495672603  delta_E= 6.35  |g|= 0.773  |ddm|= 19.4
+  HOMO = 0.270586844172368  LUMO = 1.0109348274515
+cycle= 2 E= -10.3416166652581  delta_E= -0.0993  |g|= 0.397  |ddm|= 4.31
+  HOMO = 0.255461953576566  LUMO = 1.02814846216622
+cycle= 3 E= -10.3688600998696  delta_E= -0.0272  |g|= 0.049  |ddm|=  2.8
+  HOMO = 0.242226560343363  LUMO = 1.02879725652363
+cycle= 4 E= -10.3705758398806  delta_E= -0.00172  |g|= 0.0149  |ddm|= 0.796
+  HOMO = 0.247772445514621  LUMO = 1.02917878604058
+cycle= 5 E= -10.3708128917288  delta_E= -0.000237  |g|= 0.00934  |ddm|= 0.071
+  HOMO = 0.247279370798635  LUMO = 1.02956779473146
+cycle= 6 E= -10.3709952728516  delta_E= -0.000182  |g|= 0.00462  |ddm|= 0.111
+  HOMO = 0.24772596077466  LUMO = 1.02960665093283
+cycle= 7 E= -10.3710455223143  delta_E= -5.02e-05  |g|= 0.000971  |ddm|= 0.0647
+  HOMO = 0.247684259957615  LUMO = 1.02960833646342
+cycle= 8 E= -10.3710467218951  delta_E= -1.2e-06  |g|= 9.08e-05  |ddm|= 0.0124
+  HOMO = 0.247685113242184  LUMO = 1.02960517397068
+cycle= 9 E= -10.3710467243417  delta_E= -2.45e-09  |g|= 1.54e-05  |ddm|= 0.000579
+  HOMO = 0.247687046466945  LUMO = 1.02960326455353
+converged SCF energy = -10.3710467243417

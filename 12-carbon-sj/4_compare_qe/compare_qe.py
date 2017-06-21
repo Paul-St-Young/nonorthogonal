@@ -18,14 +18,14 @@ if __name__ == '__main__':
 
   from pwscf_h5 import PwscfH5
   wf = PwscfH5()
+  wf.read('../2_hdf5/pwscf.pwscf.h5')
   wf_qe = PwscfH5()
+  qe_h5 = '../../10-carbon-dimer/2_orbs/pwscf.pwscf.h5'
+  wf_qe.read(qe_h5)
   for istate in range(4):
-    wf.read('../2_hdf5/pwscf.pwscf.h5')
     psir = wf.get_psir_from_psig(ikpt,ispin,istate,rgrid_shape)
     val = np.absolute(psir)*vol/np.prod(rgrid_shape)
 
-    qe_h5 = '../../10-carbon-dimer/2_orbs/pwscf.pwscf.h5'
-    wf_qe.read(qe_h5)
     psir1 = wf_qe.get_psir_from_psig(ikpt,ispin,istate,rgrid_shape)
     val1 = np.absolute(psir1)
 

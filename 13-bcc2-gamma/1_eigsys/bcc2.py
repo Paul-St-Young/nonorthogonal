@@ -30,7 +30,7 @@ def build_bcc2_cell(verbose=4):
 def run_bcc2(chkfile_name='vdz.h5',verbose=4):
   from pyscf.pbc.scf import RHF
   cell = build_bcc2_cell(verbose=verbose)
-  mf   = RHF(cell,exxdiv=None)
+  mf   = RHF(cell)#,exxdiv=None)
   mf.max_cycle = 50
   mf.conv_tol  = 1e-7
   mf.diis_start_cycle = 1

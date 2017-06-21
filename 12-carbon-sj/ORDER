@@ -1,0 +1,5 @@
+1_eigsys: run pyscf to generate a database containing the Kohn-Sham eigensystem
+2_hdf5: convert eigensystem database into HDF5 format
+3_qmcpack: run QMCPACK on the generated HDF5 file
+4_compare_qe: compare HDF5 file with that generated using pw2qmcpack
+5_qe_electrons_pyscf: transfer the /electrons group into the pyscf hdf5
