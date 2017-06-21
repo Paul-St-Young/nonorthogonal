@@ -5,9 +5,9 @@ import sys
 sys.path.insert(0,'../../3-psir2hdf5/batch_convert/')
 from convert_psir_to_psig import isosurf
 sys.path.insert(0,'../1_psig_to_moR/')
-from psig_to_moR import simulate_bcc2, psig_to_psir, get_psir, get_pyscf_psir
 
 def check_orb(pwscf_h5_fname,ikpt=0,ispin=0,istate=0,thres=5):
+    from psig_to_moR import get_psir, get_pyscf_psir
     """ check  """
     psir0 = get_pyscf_psir(kmf,cell,**loc)
     val0  = np.absolute(psir0)
@@ -38,6 +38,7 @@ def check_orb(pwscf_h5_fname,ikpt=0,ispin=0,istate=0,thres=5):
 # end def check_orb
 
 if __name__ == '__main__':
+    from psig_to_moR import simulate_bcc2
 
     # run DFT
     kgrid = [2,2,2]

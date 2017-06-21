@@ -42,7 +42,7 @@ def isosurf(ax,vol,level=None):
       draw on ax """
 
     nx,ny,nz = vol.shape
-    lmin,lmax = vol.mean(),vol.max()
+    lmin,lmax = vol.min(),vol.max()
 
     if level is None: # set level to average if none given
         level = 0.5*(lmin+lmax)
