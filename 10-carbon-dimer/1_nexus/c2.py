@@ -55,6 +55,7 @@ if __name__ == '__main__':
       # generate simulation objects
       scf_inputs = obj(
         input_type = 'scf',
+        input_dft  = 'pbe',
         path       = subdir+'/scf',
         identifier = 'scf',
         system    = system.copy(),
