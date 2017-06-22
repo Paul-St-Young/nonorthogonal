@@ -1,6 +1,12 @@
 system: 2 carbon atoms in on a diamond lattice
 basis: modified BFD double-zeta, diffuse functions removed by Lucas K. Wagner
 
+Step 1: Store PySCF orbitals in QMCPACK format
+------------------------------------------------------
 diamond_carbon.py reads the checkpoint file 'vdz.h5' and makes the wavefunction file 'pyscf2pwscf.h5' and input file 'test.xml'. If the checkpoint file is not available, then pyscf will run the restricted Hartree-Fock calculation from scratch. The calculation is slow, but should not take more than 10 min on a 4-core Intel i5.
 
 The test.xml file is not complete, so vmc.xml is provided as a reference.
+
+Step 2: Verify the wavefunction (hdf5) file
+------------------------------------------------------
+check_orbs.py reads the checkpoint file 'vdz.h5' and generates PySCF orbitals on real-space grids. It also reads the wavefunction file 'pyscf2qmcpack.h5' and translates the plane-wave coefficients to a real-space orbital. It then compares the orbitals generated in both ways and veriy that they are numerically equivalent (np.allclose)
