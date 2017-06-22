@@ -1,0 +1,39 @@
+!
+!  Sample input file for phfmol calculations.
+!
+!  ( * Verify phfmol documentation for a detailed explanation of
+!      each of the variables. * )
+!
+!
+!  NOTES:
+!
+!  - All character values must be lowercase.
+!  - All namelists should be included, with the order provided, even
+!    if no variable is assigned.
+!
+!
+&ham_data
+  nbas   = 48,
+  ni2s   = 666410,
+  fdet   = 'phfmol.det',
+  fints  = 'fcidump.dat' /
+!
+&nel_data
+  nup    = 4,
+  ndn    = 4 /
+!
+&mtd_data
+  wfntyp = 'rhf',
+  method = 'hf' /
+!
+&opt_data
+  igstyp = 2,
+  igsnmx = 0, 
+  igsmix = 0, 
+  gtol = 1.0e-4,
+  maxit = 1000 /
+!
+&prj_data
+  imult  = 0,
+  ngrdb  = 12 /
+!
