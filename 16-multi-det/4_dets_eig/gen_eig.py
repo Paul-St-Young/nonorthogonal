@@ -62,7 +62,7 @@ def main():
         # end for igvec
         istate = idet*nfill+iorb
         entry  = {'ikpt':ikpt,'ispin':ispin,'istate':istate,
-          'reduced_k':[0,0,0],'evalue':iorb,'evector':psig}
+          'reduced_k':[0,0,0],'evalue':istate,'evector':psig}
         data.append(entry)
       # end for iorb
     # end for idet

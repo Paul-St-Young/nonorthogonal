@@ -38,10 +38,10 @@
         <sposet type="bspline" name="spo-dn" size="8" spindataset="0"/>
       </sposet_builder>
       <determinantset>
-        <multideterminant optimize="yes" spo_up="spo-up" spo_dn="spo-dn">
+        <multideterminant optimize="no" spo_up="spo-up" spo_dn="spo-dn">
 	  <detlist size="2" type="DETS" nca="0" ncb="0" nea="4" neb="4" nstates="8" cutoff="0.01">
-            <ci id="CIcoeff_0" coeff="0.21" alpha="11110000" beta="11110000"/>
-            <ci id="CIcoeff_1" coeff="0.23" alpha="00001111" beta="00001111"/>
+            <ci id="CIcoeff_0" coeff="(7.292246367963209908e-01,-4.876193202395859849e-01)" alpha="11110000" beta="11110000"/>
+            <ci id="CIcoeff_1" coeff="(2.331397968972409862e-01,2.417371836997875929e-04)" alpha="00001111" beta="00001111"/>
           </detlist>
         </multideterminant>
       </determinantset>
@@ -55,8 +55,9 @@
     </hamiltonian>
   </qmcsystem>
   <qmc method="vmc" move="pbyp">
-    <parameter name="blocks">100</parameter>
+    <parameter name="blocks">400</parameter>
     <parameter name="steps">10</parameter>
     <parameter name="timestep">1.0</parameter>
+    <parameter name="walkers">16</parameter>
   </qmc>
 </simulation>
