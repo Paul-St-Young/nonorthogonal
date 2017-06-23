@@ -50,3 +50,7 @@ June 21
 14. run PBE in pyscf
 15. pyscf2qmcpack
 16. multi-determinant
+
+June 22
+----
+17. PBE0 with 100% exact exchange i.e. HF

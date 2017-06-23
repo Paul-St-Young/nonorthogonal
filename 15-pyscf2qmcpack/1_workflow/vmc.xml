@@ -52,8 +52,9 @@
     </hamiltonian>
   </qmcsystem>
   <qmc method="vmc" move="pbyp">
-    <parameter name="blocks">100</parameter>
+    <parameter name="blocks">400</parameter>
     <parameter name="steps">10</parameter>
     <parameter name="timestep">1.0</parameter>
+    <parameter name="walkers">512</parameter>
   </qmc>
 </simulation>

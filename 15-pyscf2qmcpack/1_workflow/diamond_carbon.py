@@ -39,7 +39,7 @@ def build_carbon_cell(verbose=4):
   }
   pseudo = {'C':'bfd'}
   alat0  = 3.6 # angstrom
-  gs     = [4,4,4]
+  gs     = [16,16,16]
 
   # convert elem,pos to text representation
   def atom_text(elem,pos):
