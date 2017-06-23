@@ -33,7 +33,7 @@
       </group>
     </particleset>
     <wavefunction name="psi0" target="e">
-            <sposet_builder type="bspline" href="../4_dets_eig/pyscf2pwscf.h5" tilematrix="1 0 0 0 1 0 0 0 1" twistnum="0" source="ion0" version="0.10" meshfactor="1.0" precision="float" truncate="no">
+            <sposet_builder type="bspline" href="../4_dets_eig/pyscf2qmcpack.h5" tilematrix="1 0 0 0 1 0 0 0 1" twistnum="0" source="ion0" version="0.10" meshfactor="1.0" precision="float" truncate="no">
          <sposet type="bspline" name="spo_ud" size="4" spindataset="0"/>
       </sposet_builder>
       <determinantset>
@@ -56,5 +56,18 @@
     <parameter name="steps">10</parameter>
     <parameter name="timestep">1.0</parameter>
     <parameter name="walkers">16</parameter>
+    <parameter name="samples">64</parameter>
+  </qmc>
+  <qmc method="dmc" move="pbyp">
+    <parameter name="blocks">40</parameter>
+    <parameter name="steps">20</parameter>
+    <parameter name="timestep">0.04</parameter>
+    <parameter name="targetwalkers">64</parameter>
+  </qmc>
+  <qmc method="dmc" move="pbyp">
+    <parameter name="blocks">40</parameter>
+    <parameter name="steps">80</parameter>
+    <parameter name="timestep">0.01</parameter>
+    <parameter name="targetwalkers">64</parameter>
   </qmc>
 </simulation>

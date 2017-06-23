@@ -73,7 +73,7 @@ def main():
     np.savetxt(gfile,int_gvecs)
   # end if
 
-  h5_fname = 'pyscf2pwscf.h5'
+  h5_fname = 'pyscf2qmcpack.h5'
   from pyscf_orbital_routines import generate_pwscf_h5
   generate_pwscf_h5(mf.cell,int_gvecs,eig_df
     ,pseudized_charge={'C':2},h5_fname=h5_fname)

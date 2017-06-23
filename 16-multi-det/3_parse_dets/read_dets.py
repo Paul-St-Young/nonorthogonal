@@ -26,8 +26,9 @@ def get_multi_determinants(det_fname):
 # end def get_multi_determinants
 
 if __name__ == '__main__':
-    det_fname = '../2_gen_dets/dets.1'
-    ci_coeff,detlist = get_multi_determinants(det_fname)
+    #det_fname = '../2_gen_dets/dets.1'
+    fname = '../6_gen_more_dets/dets.20'
+    ci_coeff,detlist = get_multi_determinants(fname)
     assert len(ci_coeff) == len(detlist)
     np.savetxt('ci_coeff.dat',ci_coeff.view(float))
     np.savetxt('detlist.dat',detlist.view(float))
