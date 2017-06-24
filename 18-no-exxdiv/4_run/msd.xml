@@ -1,0 +1,49 @@
+<simulation>
+  <project id="c2" series="0">
+    <application name="qmcapp" role="molecu" class="serial" version="1.0"/>
+  </project>
+  <qmcsystem>
+    <simulationcell>
+      <parameter name="lattice" units="bohr">
+0.0 3.40150702422 3.40150702422
+3.40150702422 0.0 3.40150702422
+3.40150702422 3.40150702422 0.0
+      </parameter>
+      <parameter name="bconds">p p p</parameter>
+      <parameter name="LR_dim_cutoff">15.0</parameter>
+    </simulationcell>
+    <particleset name="e" random="yes">
+         <group name="u" size="4" mass="1.0">
+            <parameter name="charge"              >    -1                    </parameter>
+            <parameter name="mass"                >    1.0                   </parameter>
+         </group>
+         <group name="d" size="4" mass="1.0">
+            <parameter name="charge"              >    -1                    </parameter>
+            <parameter name="mass"                >    1.0                   </parameter>
+         </group>
+      </particleset>
+    <particleset name="ion0">
+      <group name="C" size="2">
+        <parameter name="charge">4</parameter>
+        <parameter name="valence">4</parameter>
+        <attrib condition="0" datatype="posArray" name="position">
+0.0 0.0 0.0
+1.70075351211 1.70075351211 1.70075351211
+        </attrib>
+      </group>
+    </particleset>
+    <hamiltonian name="h0" type="generic" target="e">
+       <constant type="coulomb" name="IonIon" source="ion0" target="ion0"/>
+       <pairpot type="coulomb" name="ElecElec" source="e" target="e"/>
+       <pairpot type="pseudo" name="PseudoPot" source="ion0" wavefunction="psi0" format="xml">
+          <pseudo elementType="C" href="C.BFD.xml"/>
+       </pairpot>
+    </hamiltonian>
+  </qmcsystem>
+  <qmc method="vmc" move="pbyp">
+    <parameter name="blocks">400</parameter>
+    <parameter name="steps">10</parameter>
+    <parameter name="timestep">1.0</parameter>
+    <parameter name="walkers">16</parameter>
+  </qmc>
+</simulation>
