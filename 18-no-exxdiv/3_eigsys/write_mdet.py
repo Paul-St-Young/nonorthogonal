@@ -32,11 +32,7 @@ def sposet_builder(h5_file,nstate):
   return sponode
 # end def sposet_builder
 
-def main():
-  nfill = 4 # !!!! hard-code 4 orbitals per determinant
-  ci_coeff = np.loadtxt('../2_gen_dets/ci_coeff.dat').view(complex)
-  h5_file = '../3_eigsys/pyscf2qmcpack.h5'
-
+def save_mdet(fname,ci_coeff,h5_file,nfill):
   ndet = len(ci_coeff)
   nstate = ndet*nfill
 
@@ -52,7 +48,24 @@ def main():
   wf.append(spo_node)
   wf.append(detset_node)
   doc = etree.ElementTree(wf)
-  doc.write('mdet.xml',pretty_print=True)
+  doc.write(fname,pretty_print=True)
+# end def save_mdet
+
+def main():
+  nfill = 4 # !!!! hard-code 4 orbitals per determinant
+  for conj in [False,True]:
+
+    if conj:
+      ci_coeff = np.loadtxt('../2_gen_dets/coeff20/ci_coeff_conj1.dat').view(complex)
+      h5_file = '../3_eigsys/conj_dets.h5'
+      save_mdet('mdets_conj.xml',ci_coeff,h5_file,nfill)
+    else:
+      ci_coeff = np.loadtxt('../2_gen_dets/coeff20/ci_coeff_conj0.dat').view(complex)
+      h5_file = '../3_eigsys/dets.h5'
+      save_mdet('mdets.xml',ci_coeff,h5_file,nfill)
+    # end if
+  # end for
+# end def main
 
 if __name__ == '__main__':
   main()

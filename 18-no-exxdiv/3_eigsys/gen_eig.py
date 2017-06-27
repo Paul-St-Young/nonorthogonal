@@ -5,12 +5,10 @@ import pandas as pd
 from pyscf import lib
 from pyscf.pbc import gto, scf
 
+def carbon_eigensystem(mf,detlist):
 
-def main():
-  import sys
-  sys.path.insert(0,'../1_dump_integrals/')
-  from dump_integrals import run_carbon
-  mf = run_carbon(verbose=3)
+  # detlist should be checked outside of this function
+  ndet = len(detlist)
 
   from pyscf.pbc.dft import gen_grid, numint
   coords = gen_grid.gen_uniform_grids(mf.cell)
@@ -18,14 +16,6 @@ def main():
   nao = aoR.shape[1]
   rgrid_shape = 2*np.array(mf.cell.gs)+1
   assert np.prod(rgrid_shape)==aoR.shape[0]
-
-  ci_coeff = np.loadtxt('../2_gen_dets/ci_coeff.dat').view(complex)
-  detlist  = np.loadtxt('../2_gen_dets/detlist.dat').view(complex)
-  ndet = len(ci_coeff)
-  if ndet == 1: # single-determinant
-    detlist = detlist.reshape(1,len(detlist))
-  # end if
-  assert detlist.shape[0] == ndet
   assert detlist.shape[1] == nao*nao
 
   eig_fname = 'eigsys.json'
@@ -69,14 +59,46 @@ def main():
 
     eig_df = pd.DataFrame(data).set_index(
       ['ikpt','ispin','istate'],drop=True).sort_index()
-    eig_df.reset_index().to_json(eig_fname)
-    np.savetxt(gfile,int_gvecs)
+    #eig_df.reset_index().to_json(eig_fname)
+    #np.savetxt(gfile,int_gvecs)
   # end if
+  return int_gvecs,eig_df
+# end def carbon_eigensystem
 
-  h5_fname = 'pyscf2qmcpack.h5'
-  from pyscf_orbital_routines import generate_pwscf_h5
-  generate_pwscf_h5(mf.cell,int_gvecs,eig_df
-    ,pseudized_charge={'C':2},h5_fname=h5_fname)
+def main():
+
+  # get Hatree-Fock orbitals
+  import sys
+  sys.path.insert(0,'../1_dump_integrals/')
+  from dump_integrals import run_carbon
+  mf = run_carbon(verbose=3)
+
+  for conj_det in [False,True]:
+    # generate eigensystem in plane-wave basis
+    ci_coeff = np.loadtxt('../2_gen_dets/coeff20/ci_coeff_conj0.dat').view(complex)
+    if conj_det:
+      detlist  = np.loadtxt('../2_gen_dets/coeff20/detlist_conj1.dat').view(complex)
+    else:
+      detlist  = np.loadtxt('../2_gen_dets/coeff20/detlist_conj0.dat').view(complex)
+    # end if
+    # check that input is valid
+    ndet = len(ci_coeff)
+    if ndet == 1: # single-determinant
+      detlist = detlist.reshape(1,len(detlist))
+    # end if
+    assert detlist.shape[0] == ndet
+    int_gvecs,eig_df = carbon_eigensystem(mf,detlist)
+
+    # write wavefunction to hdf5
+    if conj_det:
+      h5_fname = 'conj_dets.h5'
+    else:
+      h5_fname = 'dets.h5'
+    # end if
+    from pyscf_orbital_routines import generate_pwscf_h5
+    generate_pwscf_h5(mf.cell,int_gvecs,eig_df
+      ,pseudized_charge={'C':2},h5_fname=h5_fname)
+  # end for
 
 # end def main
 
