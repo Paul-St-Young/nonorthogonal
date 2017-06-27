@@ -67,11 +67,11 @@ def read_header(mm,header_loc=0):
 # end def
 
 
-def read_next_det(mm,max_nao=1024):
+def read_next_det(mm,prefix='Determinant',max_nao=1024):
     """ mm: mmap object
         max_nao: maximum number of atominc orbital in the determinant """
 
-    idx = mm.find('Determinant')
+    idx = mm.find(prefix)
     if idx == -1:
       return -1
     mm.seek(idx)
