@@ -102,8 +102,29 @@ def main():
 
 # end def main
 
+def gen_from_detlist(detlist_fname,h5_fname):
+  # get Hatree-Fock orbitals
+  import sys
+  sys.path.insert(0,'../1_dump_integrals/')
+  from dump_integrals import run_carbon
+  mf = run_carbon(verbose=3)
+  detlist  = np.loadtxt(detlist_fname).view(complex)
+  ndet = len(detlist)
+  if ndet == 1: # single-determinant
+    detlist = detlist.reshape(1,len(detlist))
+  # end if
+  int_gvecs,eig_df = carbon_eigensystem(mf,detlist)
+  from pyscf_orbital_routines import generate_pwscf_h5
+  generate_pwscf_h5(mf.cell,int_gvecs,eig_df
+    ,pseudized_charge={'C':2},h5_fname=h5_fname)
+  # end for
+# end def gen_from_detlist
+
 if __name__ == '__main__':
 
-    main()
+  #main()
+  dfname = '../2_gen_dets/out_detlist.dat'
+  hfname = 'out_dets.h5'
+  gen_from_detlist(dfname,hfname)
 
 # end __main__
