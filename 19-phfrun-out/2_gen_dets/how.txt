@@ -1,0 +1,4 @@
+1. submit dets.msub to run phfmol
+2. uncomment tests in the __main__ of parse_phfrun_out.py to convince yourself the determinants and coefficients are read correctly
+3. out_detlist.dat should be generated to be read by pyscf2qmcpack converter
+4. diag.dat should be generated to be compared with Hii hamiltonian entries

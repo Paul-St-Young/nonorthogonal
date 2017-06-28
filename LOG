@@ -59,3 +59,7 @@ June 23
 ----
 18. self-contained multi-determinant example
 exxdiv = None to match pyscf and phfmol
+
+June 28
+----
+19. read phfrun.out
