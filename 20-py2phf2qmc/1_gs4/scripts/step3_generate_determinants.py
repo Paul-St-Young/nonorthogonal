@@ -1,0 +1,39 @@
+def step3_generate_determinants(ndet,det_dir,phfmol_inp_template='./templates/phfrun.inp',submit_file='./templates/dets.msub'):
+  import subprocess as sp
+  import os
+  already_done = os.path.isdir(det_dir)
+  if not already_done:
+    # parse fcidump.dat for neri
+    def line_num(expression,fname):
+        proc = sp.Popen(['grep','-n',expression,fname],stdout=sp.PIPE,stderr=sp.PIPE)
+        out,err = proc.communicate()
+        first_line = out.split('\n')[0]
+        idx = int(first_line.split(':')[0])
+        return idx
+    # end def line_num
+    start = line_num('&END','fcidump.dat')
+    end   = line_num('0  0','fcidump.dat')
+    neri = end-start-1 # number of 2-electron integrals (i.e. electron repulsion integrals)
+
+    # setup phfmol run
+    if not os.path.isdir(det_dir):
+      os.system('mkdir '+det_dir)
+    else:
+      raise RuntimeError('determinants already generated? remove %s to rerun' % det_dir)
+    # end if
+    #  first input
+    inp1 = os.path.join(det_dir,'phfrun0.inp')
+    os.system( ' '.join(['cp ',phfmol_inp_template,inp1]) )
+    os.system( 'sed -i "s/myni2s/%d/" %s' % (neri,inp1) )
+    os.system( 'sed -i "s/mylread/.false./" %s' % inp1 )
+    #  next inputs
+    inp2 = os.path.join(det_dir,'phfrun1.inp')
+    os.system( ' '.join(['cp ',phfmol_inp_template,inp2]) )
+    os.system( 'sed -i "s/myni2s/%d/" %s' % (neri,inp2) )
+    os.system( 'sed -i "s/mylread/.true./" %s' % inp2 )
+    #  submit job
+    fsub = os.path.join(det_dir,os.path.basename(submit_file))
+    os.system( 'cp %s %s' % (submit_file,det_dir) )
+    os.system( 'sed -i "s/myndet/%d/" %s' % (ndet,fsub) )
+    os.system( 'cd %s; sbatch %s' % (det_dir,os.path.basename(fsub)) )
+  # end if
