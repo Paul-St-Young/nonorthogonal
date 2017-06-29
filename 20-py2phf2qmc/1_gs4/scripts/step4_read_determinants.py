@@ -227,8 +227,9 @@ def step4_read_determinants(ndet,det_dir,detlist_fname='det_list.dat',coeff_list
       os.system('mkdir '+coeff_list_dir)
     # end if
     for k in range(len(coeff_list)):
+      ci_arr  = np.array(coeff_list[k],dtype=complex)
       ci_file = os.path.join(coeff_list_dir,'ci%d.dat'%k)
-      np.savetxt(ci_file,coeff_list[k])
+      np.savetxt(ci_file,ci_arr.view(float))
     # end for k
   # end if
 

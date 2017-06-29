@@ -31,19 +31,22 @@ if __name__ == '__main__':
   from step2_dump_integral_table import step2_dump_integral_table
   from step3_generate_determinants import step3_generate_determinants
   from step4_read_determinants import step4_read_determinants
+  from step6_write_qmcpack_input import step6_write_qmcpack_input
 
   # define parameters
   # =============================
   ndet = 21            # number of determinants in expansion
   det_dir = 'gen_dets' # folder to store determinants
   nfill = 4            # number of occupied orbitals in each determinant
+  grid_shape = (4,4,4) # shape of real-space grid
 
   # execute steps
   # =============================
   from datetime import datetime
+  """
   print(datetime.now())
   print('performing Hatree-Fock calculation')
-  mf = step1_run_pyscf()                    # generate pyscf checkpoint file: vdz.h5
+  mf = step1_run_pyscf(grid_shape)          # generate pyscf checkpoint file: vdz.h5
   print(mf.e_tot)
   print(datetime.now())
   step2_dump_integral_table(mf)             # generate integral table: fcidump.dat
@@ -61,5 +64,11 @@ if __name__ == '__main__':
   print('Fourier transform to generate wavefunction file')
   step5_generate_qmcpack_wavefunction_file('det_list.dat','dets.h5',nfill,mf) # read determinants and create hdf5 file containing all orbitals: dets.h5
   print(datetime.now())
+  """
+
+  from step1_run_pyscf import build_carbon_cell
+  cell = build_carbon_cell(grid_shape,verbose=3)
+  step6_write_qmcpack_input('msd.xml',cell,'dets.h5',4,4) # write msd.xml
+
 
 # end __main__
