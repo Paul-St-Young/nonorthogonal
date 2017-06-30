@@ -4,7 +4,7 @@
 #MSUB -l walltime=00:30:00
 #MSUB -q pbatch
 
-BIN=/g/g91/yang41/soft/qmcpack/build/bin/qmcpack
+BIN=/g/g91/yang41/soft/qmcpack/build/bin/qmcpack_comp
 
 export OMP_NUM_THREADS=1
 date
