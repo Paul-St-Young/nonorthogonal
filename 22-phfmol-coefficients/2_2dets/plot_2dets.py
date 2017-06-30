@@ -24,17 +24,19 @@ if __name__ == '__main__':
   real_results = np.loadtxt('real_code/results.dat')
   comp_results = np.loadtxt('comp_code/results.dat')
   phfmol_results = np.loadtxt('gen_dets/paire.dat')
-
+  npair = len(real_results)
 
   import matplotlib.pyplot as plt
   fig,ax = plt.subplots(1,1)
+  ax.set_xlim(-0.5,npair-0.5)
+  ax.set_xticks(range(npair))
   ax.set_xlabel('determinant pair',fontsize=16)
   ax.set_ylabel('total energy (ha)',fontsize=16)
 
   rline = plot_result(ax,real_results,label='RealType')
   cline = plot_result(ax,comp_results,label='ValueType')
   mline = plot_phfmol(ax,phfmol_results,label='phfmol')
-  ax.legend(loc='upper left')
+  ax.legend(loc='lower right')
 
   # set labels
   xlabels = get_xlabel(real_results)
@@ -47,5 +49,7 @@ if __name__ == '__main__':
     assert xlabels[i] == plabels[i]
   # end for i
   
+  fig.tight_layout()
+  #fig.savefig('det_pairs.eps')
   plt.show()
 # end __main__
