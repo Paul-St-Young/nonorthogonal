@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
   # define parameters
   # =============================
-  ndet = 21            # number of determinants in expansion
+  ndet = 5             # number of determinants in expansion
   det_dir = 'gen_dets' # folder to store determinants
   nfill = 4            # number of occupied orbitals in each determinant
   grid_shape = (4,4,4) # shape of real-space grid
@@ -43,7 +43,6 @@ if __name__ == '__main__':
   # execute steps
   # =============================
   from datetime import datetime
-  """
   print(datetime.now())
   print('performing Hatree-Fock calculation')
   mf = step1_run_pyscf(grid_shape)          # generate pyscf checkpoint file: vdz.h5
@@ -64,11 +63,10 @@ if __name__ == '__main__':
   print('Fourier transform to generate wavefunction file')
   step5_generate_qmcpack_wavefunction_file('det_list.dat','dets.h5',nfill,mf) # read determinants and create hdf5 file containing all orbitals: dets.h5
   print(datetime.now())
-  """
 
-  from step1_run_pyscf import build_carbon_cell
-  cell = build_carbon_cell(grid_shape,verbose=3)
-  step6_write_qmcpack_input('msd.xml',cell,'dets.h5',4,4) # write msd.xml
+  #from step1_run_pyscf import build_carbon_cell
+  #cell = build_carbon_cell(grid_shape,verbose=3)
+  step6_write_qmcpack_input('msd.xml',mf.cell,'dets.h5',4,4) # write msd.xml
 
 
 # end __main__

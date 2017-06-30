@@ -7,7 +7,6 @@
 BIN=/g/g91/yang41/soft/git_phfmol/phfmol.x
 export OMP_NUM_THREADS=72
 
-#663379
 integral_file=../fcidump.dat
 inp0_ref=phfrun0.inp
 inp1_ref=phfrun1.inp
