@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 import numpy as np
-import h5py
-import matplotlib.pyplot as plt
-from pwscf_h5 import PwscfH5
-from skimage import measure
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 # Yubo "Paul" Yang, June 9 2017
 #  convert between psi_g and psi_r in pwscf.h5 file from pw2qmcpack
@@ -40,7 +35,7 @@ def isosurf(ax,vol,level=None):
       None
     Effect:
       draw on ax """
-
+    from skimage import measure
     nx,ny,nz = vol.shape
     lmin,lmax = vol.min(),vol.max()
 
@@ -96,6 +91,7 @@ if __name__ == '__main__':
     vstate = 0
 
     # 3D image
+    from pwscf_h5 import PwscfH5
     wf = PwscfH5()
     wf.read('pwscf.pwscf.h5')
     gvec = wf.get('gvectors')
@@ -116,6 +112,8 @@ if __name__ == '__main__':
                 print val.min(),val.max()
                 print valr.min(),valr.max()
                
+                import matplotlib.pyplot as plt
+                from mpl_toolkits.mplot3d.art3d import Poly3DCollection
                 fig = plt.figure()
                 ax  = fig.add_subplot(121,projection='3d',aspect=1)
                 ax1 = fig.add_subplot(122,projection='3d',aspect=1)

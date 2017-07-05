@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import numpy as np
+
 def read_comp(fname):
   arr = []
   with open(fname,'r') as f:

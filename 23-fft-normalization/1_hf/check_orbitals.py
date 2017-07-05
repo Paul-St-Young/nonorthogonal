@@ -45,12 +45,10 @@ def numpy_fft_state(wf_fname,ikpt,ispin,istate):
 if __name__ == '__main__':
 
   import sys
-  sys.path.insert(0,'../../3-psir2hddf5/batch_convert')
-  from convert_psir_to_psig import isosurf
   sys.path.insert(0,'../../15-pyscf2qmcpack/3_qmcpack')
   from show_fftbox import read_comp
 
-  fname = 'pyscf2pwscf.h5'
+  fname = '../../15-pyscf2qmcpack/1_workflow/pyscf2pwscf.h5'
   ikpt   = 0
   ispin  = 0
   istate = 0
@@ -73,6 +71,8 @@ if __name__ == '__main__':
   qbefore_fftbox_arr = read_comp('fftbox%d_before.dat'%istate)
   qbefore_fftbox = (qbefore_fftbox_arr[:,0]+1j*qbefore_fftbox_arr[:,1]).reshape(grid_shape)
 
+  sys.path.insert(0,'../../3-psir2hdf5/batch_convert')
+  from convert_psir_to_psig import isosurf
   if pw_fftbox:
     import matplotlib.pyplot as plt
     fig = plt.figure()
@@ -99,8 +99,6 @@ if __name__ == '__main__':
     isosurf(qax, np.absolute(qafter_fftbox) )
     plt.show()
   # end if
-  assert np.allclose(pafter_fftbox.real,qafter_fftbox.real)
-  assert np.allclose(pafter_fftbox.imag,qafter_fftbox.imag)
 
   import matplotlib.pyplot as plt
   fig,ax = plt.subplots(2,1)
@@ -109,5 +107,7 @@ if __name__ == '__main__':
   ax[1].plot( pafter_fftbox.imag.flatten() )
   ax[1].plot( qafter_fftbox.imag.flatten() )
   plt.show()
+  assert np.allclose(pafter_fftbox.real,qafter_fftbox.real)
+  assert np.allclose(pafter_fftbox.imag,qafter_fftbox.imag)
 
 # end __main__
