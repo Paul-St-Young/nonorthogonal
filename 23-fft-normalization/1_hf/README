@@ -1,0 +1,8 @@
+pyscf2qmcpack.h5 from 15-pyscf2qmcpack/1_workflow
+
+Goal: understand the normalization scheme used by fftw
+Strategy: print out FFTbox from QMCPACK and compare
+
+Step 1: enable direct control of meshgrid
+Step 2: hard-code dump FFTbox
+Step 3: construct FFTbox using numpy and compare normalization
