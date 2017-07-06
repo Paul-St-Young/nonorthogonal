@@ -20,11 +20,23 @@ def plot_phfmol(ax,results,label):
 # end def 
 
 if __name__ == '__main__':
+  ewald_correction = -2.695783
+
   # 9 columns: idet jdet E Ee corr  V Ve corr  ratio
   real_results = np.loadtxt('real_code/results.dat')
   comp_results = np.loadtxt('comp_code/results.dat')
   phfmol_results = np.loadtxt('gen_dets/paire.dat')
   npair = len(real_results)
+
+  single_det = np.loadtxt('../3_just1/ke.dat')
+  ndet = len(single_det)
+  single_det[:,1] += ewald_correction
+  from itertools import combinations
+  savg = []
+  for (idet,jdet) in combinations(range(ndet),2):
+    avg = 0.5*(single_det[idet,1] + single_det[jdet,1])
+    savg.append(avg)
+  # end for
 
   import matplotlib.pyplot as plt
   fig,ax = plt.subplots(1,1)
@@ -33,10 +45,12 @@ if __name__ == '__main__':
   ax.set_xlabel('determinant pair',fontsize=16)
   ax.set_ylabel('total energy (ha)',fontsize=16)
 
-  rline = plot_result(ax,real_results,label='RealType')
-  cline = plot_result(ax,comp_results,label='ValueType')
+  rline = plot_result(ax,real_results,label='QMCPACK RealType')
+  cline = plot_result(ax,comp_results,label='QMCPACK ValueType')
   mline = plot_phfmol(ax,phfmol_results,label='phfmol')
+  #ax.plot(savg,marker='s',label='single-det average')
   ax.legend(loc='lower right')
+
 
   # set labels
   xlabels = get_xlabel(real_results)
