@@ -23,6 +23,7 @@ if __name__ == '__main__':
   ewald_correction = -2.695783
 
   # 9 columns: idet jdet E Ee corr  V Ve corr  ratio
+  real_results = np.loadtxt('real_code/results.dat')
   comp_results = np.loadtxt('comp_code/results.dat')
   phfmol_results = np.loadtxt('gen_dets/paire.dat')
   npair = len(comp_results)
@@ -34,6 +35,7 @@ if __name__ == '__main__':
   ax.set_xlabel('determinant pair',fontsize=16)
   ax.set_ylabel('total energy (ha)',fontsize=16)
 
+  rline = plot_result(ax,real_results,label='QMCPACK RealType')
   cline = plot_result(ax,comp_results,label='QMCPACK ValueType')
   mline = plot_phfmol(ax,phfmol_results,label='phfmol')
   ax.legend(loc='lower right')
