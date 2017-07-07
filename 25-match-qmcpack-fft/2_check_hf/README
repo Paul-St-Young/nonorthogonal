@@ -1,0 +1,2 @@
+vmc.xml check_orbitals.py from 23-fft-normalization/1_hf
+output fftbox and psig from qmcpack

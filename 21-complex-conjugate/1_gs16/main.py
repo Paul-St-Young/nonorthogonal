@@ -22,6 +22,15 @@ def step5_generate_qmcpack_wavefunction_file(detlist_fname,wf_h5_fname,nfill,mf)
   gvecs,eig_df = save_multideterminant_orbitals(detlist,nfill,mf)
   generate_pwscf_h5(mf.cell,gvecs,eig_df,pseudized_charge={'C':2},h5_fname=wf_h5_fname)
 
+def dump_molecular_orbitals(mf):
+  from pyscf_orbital_routines import get_pyscf_psir
+  norb = 4 # !!!! hard-code write out the first four orbitals
+  for iorb in range(norb):
+    moR = get_pyscf_psir(mf.mo_coeff[:,iorb],mf.cell)
+    np.savetxt('moR%d.dat'%iorb,moR.flatten().view(float))
+  # end for iorb
+# end def dump_molecular_orbitals
+
 if __name__ == '__main__':
   # import scripts for each step
   # =============================
@@ -48,6 +57,9 @@ if __name__ == '__main__':
   mf = step1_run_pyscf(grid_shape)          # generate pyscf checkpoint file: vdz.h5
   print(mf.e_tot)
   print(datetime.now())
+
+  #dump_molecular_orbitals(mf)
+
   step2_dump_integral_table(mf)             # generate integral table: fcidump.dat
   step3_generate_determinants(ndet,det_dir) # generate determinants using phfmol 
   # make sure determinants are generated
@@ -56,8 +68,10 @@ if __name__ == '__main__':
     raise RuntimeError('Still running step 3: %d/%d determinants done' % (ndone+1,ndet)) 
   # end if
 
-  step4_read_determinants(ndet,det_dir)     # read determinants and expansion coefficients: detlist.dat, ci_coeffs.dat
-  assert os.path.isfile('det_list.dat')
+  if not os.path.isfile('det_list.dat'):
+    step4_read_determinants(ndet,det_dir)     # read determinants and expansion coefficients: detlist.dat, ci_coeffs.dat
+    assert os.path.isfile('det_list.dat')
+  # end if
 
   print(datetime.now())
   print('Fourier transform to generate wavefunction file')
@@ -67,6 +81,5 @@ if __name__ == '__main__':
   #from step1_run_pyscf import build_carbon_cell
   #cell = build_carbon_cell(grid_shape,verbose=3)
   step6_write_qmcpack_input('msd.xml',mf.cell,'dets.h5',4,4) # write msd.xml
-
 
 # end __main__

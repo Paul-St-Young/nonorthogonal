@@ -115,3 +115,7 @@ results/
 
 # qmcpack
 *.xml
+
+# phfmol
+phfrun.*
+dets.*

@@ -76,3 +76,8 @@ June 30
 July 5
 ----
 23. FFT normalization
+
+July 6
+----
+24. remove fix_phase_rotate_c2c
+25. rerun using consistent FFT normalization and no fix_phase_rotate_c2c
