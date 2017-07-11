@@ -81,3 +81,8 @@ July 6
 ----
 24. remove fix_phase_rotate_c2c
 25. rerun using consistent FFT normalization and no fix_phase_rotate_c2c
+
+July 7
+----
+26. bcc-2
+* failed to converge PySCF

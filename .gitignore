@@ -109,6 +109,7 @@ results/
 *.h5
 *.ipynb
 *.json
+*.eps
 
 # vim
 .*.swp
