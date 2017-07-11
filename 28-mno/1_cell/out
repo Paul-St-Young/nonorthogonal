@@ -1,0 +1,112 @@
+#INFO: **** input file is /home/yang41/Desktop/nonorthogonal/28-mno/1_cell/main.py ****
+import numpy as np
+import h5py
+from pyscf.pbc import gto, scf
+
+if __name__ == '__main__':
+  
+  alat = 2.34301125
+
+  axes_text = '''
+   {alat:12.10f}  {half:12.10f}  {half:12.10f}
+   {half:12.10f}  {alat:12.10f}  {half:12.10f}
+   {half:12.10f}  {half:12.10f}  {alat:12.10f}
+  '''.format(alat=alat,half=alat/2.)
+  atom_text = '''
+   Mn      0.00000      0.00000      0.00000
+   Mn      {alat:12.10f} {alat:12.10f} {alat:12.10f}
+   O       {half:12.10f} {half:12.10f} {half:12.10f}
+   O       {half3:12.10f} {half3:12.10f} {half3:10.6}
+  '''.format(alat=alat,half=alat/2.,half3=3.*alat/2.)
+
+  cell = gto.M(
+    verbose = 4,
+    gs      = [16]*3,
+    a       = axes_text,
+    atom    = atom_text,
+    pseudo  = {'Mn':'bfd','O':'bfd'},
+  )
+
+  from nexus import Structure
+  assert cell.unit == 'angstrom'
+  struct = Structure(axes = cell.lattice_vectors(),elem=['Mn','Mn','O','O'],pos=cell.atom_coords(),units='A')
+  struct.write('mno.xsf')
+
+# end __main__
+#INFO: ******************** input file end ********************
+
+
+System: ('Linux', 'ccms-103-vm', '4.11.5-200.fc25.x86_64', '#1 SMP Wed Jun 14 17:17:29 UTC 2017', 'x86_64', 'x86_64')  Threads 4
+Python 2.7.13 (default, May 10 2017, 20:04:28) 
+[GCC 6.3.1 20161221 (Red Hat 6.3.1-1)]
+numpy 1.13.0  scipy 0.19.0
+Date: Tue Jul 11 11:57:16 2017
+PySCF version 1.4a
+PySCF path  /home/yang41/soft/pyscf/pyscf
+[INPUT] VERBOSE 4
+[INPUT] num atoms = 4
+[INPUT] num electrons = 42
+[INPUT] charge = 0
+[INPUT] spin (= nelec alpha-beta = 2S) = 0
+[INPUT] symmetry False subgroup None
+[INPUT]  1 Mn     0.000000000000   0.000000000000   0.000000000000 AA    0.000000000000   0.000000000000   0.000000000000 Bohr
+[INPUT]  2 Mn     2.343011250000   2.343011250000   2.343011250000 AA    4.427649569275   4.427649569275   4.427649569275 Bohr
+[INPUT]  3 O      1.171505625000   1.171505625000   1.171505625000 AA    2.213824784637   2.213824784637   2.213824784637 Bohr
+[INPUT]  4 O      3.514516875000   3.514516875000   3.514520000000 AA    6.641474353912   6.641474353912   6.641480259306 Bohr
+[INPUT] ---------------- BASIS SET ---------------- 
+[INPUT] l, kappa, [nprim/nctr], expnt,             c_1 c_2 ...
+[INPUT] Mn
+[INPUT] 0    0    [3    /1   ]  1337.153266       0.1543289673
+                                243.5641365       0.5353281423
+                                65.91796062       0.4446345422
+[INPUT] 0    0    [3    /1   ]  102.0220021       -0.0999672292
+                                23.70771923       0.3995128261
+                                7.710486098       0.7001154689
+[INPUT] 0    0    [3    /1   ]  7.701960922       -0.2277635023
+                                2.349343572       0.2175436044
+                                0.906449787       0.9166769611
+[INPUT] 0    0    [3    /1   ]  0.670982286       -0.3088441215
+                                0.247634663       0.0196064117
+                                0.109358078       1.131034442
+[INPUT] 1    0    [3    /1   ]  102.0220021       0.155916275
+                                23.70771923       0.6076837186
+                                7.710486098       0.3919573931
+[INPUT] 1    0    [3    /1   ]  7.701960922       0.0049515112
+                                2.349343572       0.5777664691
+                                0.906449787       0.4846460366
+[INPUT] 1    0    [3    /1   ]  0.670982286       -0.12154686
+                                0.247634663       0.5715227604
+                                0.109358078       0.5498949471
+[INPUT] 2    0    [3    /1   ]  5.426950461       0.2197679508
+                                1.655392868       0.6555473627
+                                0.638702032       0.286573259
+[INPUT] O
+[INPUT] 0    0    [3    /1   ]  130.70932         0.15432897
+                                23.808861         0.53532814
+                                6.4436083         0.44463454
+[INPUT] 0    0    [3    /1   ]  5.0331513         -0.09996723
+                                1.1695961         0.39951283
+                                0.380389          0.70011547
+[INPUT] 1    0    [3    /1   ]  5.0331513         0.15591627
+                                1.1695961         0.60768372
+                                0.380389          0.39195739
+nuclear repulsion = -314.587674057473
+number of shells = 22
+number of NR pGTOs = 138
+number of NR cGTOs = 46
+basis = sto-3g
+ecp = {'Mn': 'bfd', 'O': 'bfd'}
+CPU time:         0.40
+lattice vectors  a1 [4.427649569, 2.213824785, 2.213824785]
+                 a2 [2.213824785, 4.427649569, 2.213824785]
+                 a3 [2.213824785, 2.213824785, 4.427649569]
+dimension = 3
+Cell volume = 43.4
+rcut = 20.0118049706 (nimgs = [8 8 8])
+lattice sum = 1901 cells
+precision = 1e-08
+pseudo = {}
+gs (FFT-mesh) = [16, 16, 16]
+    = ke_cutoff [ 708.85257021  708.85257021  708.85257021]
+ew_eta = 3.54465
+ew_cut = 1.71235918939 (nimgs = [1 1 1])

@@ -86,3 +86,9 @@ July 7
 ----
 26. bcc-2
 * failed to converge PySCF
+
+July 11
+----
+27. restore rotate
+try using fix_phase_rotate
+28. MnO ref: Lubos PRB 82, 115108 (2010).
