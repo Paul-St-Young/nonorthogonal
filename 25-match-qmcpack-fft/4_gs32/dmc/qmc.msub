@@ -1,0 +1,11 @@
+#!/bin/bash
+#SBATCH -N 1
+#SBATCH -p pbatch
+#SBATCH -t 90
+
+BIN=/g/g91/yang41/soft/quartz_qmcpack/build/bin/qmcpack
+
+export OMP_NUM_THREADS=1
+date
+srun -n 36 $BIN vmc.xml
+date

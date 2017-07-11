@@ -125,10 +125,10 @@ if __name__ == '__main__':
     try:
       cell = mf.cell
     except:
-      from step1_run_pyscf import build_carbon_cell
-      cell = build_carbon_cell(grid_shape,verbose=3)
+      from step1_run_pyscf import build_bcc2_cell
+      cell = build_bcc2_cell(grid_shape,verbose=3)
     # end try
-    nup,ndn = cell.nelec()
+    nup,ndn = cell.nelec
     step6_write_qmcpack_input(check_points[6],cell,check_points[5],nup,ndn,proj_id='bcc16') # write msd.xml
   # end if
 

@@ -36,6 +36,7 @@ def isosurf(ax,vol,level=None):
     Effect:
       draw on ax """
     from skimage import measure
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
     nx,ny,nz = vol.shape
     lmin,lmax = vol.min(),vol.max()
 
