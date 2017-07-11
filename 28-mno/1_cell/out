@@ -1,4 +1,4 @@
-#INFO: **** input file is /home/yang41/Desktop/nonorthogonal/28-mno/1_cell/main.py ****
+#INFO: **** input file is 28-mno/1_cell/main.py ****
 import numpy as np
 import h5py
 from pyscf.pbc import gto, scf
@@ -25,10 +25,10 @@ if __name__ == '__main__':
     a       = axes_text,
     atom    = atom_text,
     pseudo  = {'Mn':'bfd','O':'bfd'},
+    unit    = 'angstrom'
   )
 
   from nexus import Structure
-  assert cell.unit == 'angstrom'
   struct = Structure(axes = cell.lattice_vectors(),elem=['Mn','Mn','O','O'],pos=cell.atom_coords(),units='A')
   struct.write('mno.xsf')
 
@@ -36,13 +36,13 @@ if __name__ == '__main__':
 #INFO: ******************** input file end ********************
 
 
-System: ('Linux', 'ccms-103-vm', '4.11.5-200.fc25.x86_64', '#1 SMP Wed Jun 14 17:17:29 UTC 2017', 'x86_64', 'x86_64')  Threads 4
-Python 2.7.13 (default, May 10 2017, 20:04:28) 
-[GCC 6.3.1 20161221 (Red Hat 6.3.1-1)]
+System: ('Linux', 'ubuntu', '4.4.0-83-generic', '#106-Ubuntu SMP Mon Jun 26 17:54:43 UTC 2017', 'x86_64', 'x86_64')  Threads 8
+Python 2.7.12 (default, Nov 19 2016, 06:48:10) 
+[GCC 5.4.0 20160609]
 numpy 1.13.0  scipy 0.19.0
-Date: Tue Jul 11 11:57:16 2017
+Date: Tue Jul 11 12:04:39 2017
 PySCF version 1.4a
-PySCF path  /home/yang41/soft/pyscf/pyscf
+PySCF path  /home/yyang173/soft/pyscf/pyscf
 [INPUT] VERBOSE 4
 [INPUT] num atoms = 4
 [INPUT] num electrons = 42
@@ -96,7 +96,7 @@ number of NR pGTOs = 138
 number of NR cGTOs = 46
 basis = sto-3g
 ecp = {'Mn': 'bfd', 'O': 'bfd'}
-CPU time:         0.40
+CPU time:         2.17
 lattice vectors  a1 [4.427649569, 2.213824785, 2.213824785]
                  a2 [2.213824785, 4.427649569, 2.213824785]
                  a3 [2.213824785, 2.213824785, 4.427649569]

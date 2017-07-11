@@ -24,10 +24,10 @@ if __name__ == '__main__':
     a       = axes_text,
     atom    = atom_text,
     pseudo  = {'Mn':'bfd','O':'bfd'},
+    unit    = 'angstrom'
   )
 
   from nexus import Structure
-  assert cell.unit == 'angstrom'
   struct = Structure(axes = cell.lattice_vectors(),elem=['Mn','Mn','O','O'],pos=cell.atom_coords(),units='A')
   struct.write('mno.xsf')
 
