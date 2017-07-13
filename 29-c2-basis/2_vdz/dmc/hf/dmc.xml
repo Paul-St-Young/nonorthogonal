@@ -1,0 +1,82 @@
+<simulation>
+  <qmcsystem>
+    <project id="c2" series="0"/>
+    <simulationcell>
+      <parameter name="lattice" units="bohr">
+0.0 3.40150702422 3.40150702422
+3.40150702422 0.0 3.40150702422
+3.40150702422 3.40150702422 0.0
+</parameter>
+      <parameter name="bconds">p p p</parameter>
+      <parameter name="LR_dim_cutoff">15.0</parameter>
+    </simulationcell>
+    <particleset name="e" random="yes">
+      <group mass="1.0" name="u" size="4">
+        <parameter name="charge">  -1  </parameter>
+      </group>
+      <group mass="1.0" name="d" size="4">
+        <parameter name="charge">  -1  </parameter>
+      </group>
+    </particleset>
+    <particleset name="ion0">
+      <group name="C" size="2">
+        <parameter name="charge">4</parameter>
+        <parameter name="valence">4</parameter>
+        <attrib condition="0" datatype="posArray" name="position">
+0.0 0.0 0.0
+1.70075351211 1.70075351211 1.70075351211
+</attrib>
+      </group>
+    </particleset>
+    <wavefunction name="psi0" target="e">
+      <sposet_builder type="bspline" href="../../dets.h5" tilematrix="1 0 0 0 1 0 0 0 1" twistnum="0" source="ion0" version="0.10" meshfactor="1.0" precision="double" truncate="no">
+        <sposet type="bspline" name="spo_ud" size="4" spindataset="0"/>
+      </sposet_builder>
+      <determinantset>
+        <slaterdeterminant>
+          <determinant id="updet" group="u" sposet="spo_ud" size="4"/>
+          <determinant id="downdet" group="d" sposet="spo_ud" size="4"/>
+        </slaterdeterminant>
+      </determinantset>
+      <jastrow type="One-Body" name="J1" function="bspline" source="ion0" print="yes">
+        <correlation elementType="C" size="8" cusp="0.0">
+          <coefficients id="eC" type="Array" optimize="yes"> -0.1409018395 -0.1236514291 -0.1113968187 -0.09388278133 -0.07529839528 -0.05384957671 -0.0320972564 -0.01697193848</coefficients>
+        </correlation>
+      </jastrow>
+      <jastrow type="Two-Body" name="J2" function="bspline" print="yes">
+        <correlation speciesA="u" speciesB="u" size="8">
+          <coefficients id="uu" type="Array" optimize="yes"> 0.2117267185 0.1494163824 0.1030944351 0.068487067 0.0432477228 0.02522295124 0.01290936849 0.005521628714</coefficients>
+        </correlation>
+        <correlation speciesA="u" speciesB="d" size="8">
+          <coefficients id="ud" type="Array" optimize="yes"> 0.3185372379 0.2023496288 0.1241859087 0.07261785539 0.03992626374 0.02028409989 0.008945805153 0.003454470718</coefficients>
+        </correlation>
+      </jastrow>
+    </wavefunction>
+    <hamiltonian name="h0" target="e" type="generic">
+      <constant name="IonIon" source="ion0" target="ion0" type="coulomb"/>
+      <pairpot name="ElecElec" source="e" target="e" type="coulomb"/>
+      <pairpot format="xml" name="PseudoPot" source="ion0" target="e" type="pseudo" wavefunction="psi0">
+        <pseudo elementType="C" href="C.BFD.xml"/>
+      </pairpot>
+    </hamiltonian>
+  </qmcsystem>
+  <qmc method="vmc" move="pbyp">
+    <parameter name="blocks">400</parameter>
+    <parameter name="steps">10</parameter>
+    <parameter name="timestep">1.0</parameter>
+    <parameter name="walkers">16</parameter>
+    <parameter name="samples">512</parameter>
+  </qmc>
+  <qmc method="dmc" move="pbyp" checkpoint="0">
+    <parameter name="blocks">100</parameter>
+    <parameter name="steps">10</parameter>
+    <parameter name="timestep">0.02</parameter>
+    <parameter name="targetwalkers">512</parameter>
+  </qmc>
+  <qmc method="dmc" move="pbyp" checkpoint="0">
+    <parameter name="blocks">100</parameter>
+    <parameter name="steps">50</parameter>
+    <parameter name="timestep">0.01</parameter>
+    <parameter name="targetwalkers">512</parameter>
+  </qmc>
+</simulation>
