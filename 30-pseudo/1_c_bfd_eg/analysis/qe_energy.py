@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import numpy as np
 
 def collect_dft(json_fname):
   import subprocess as sp
@@ -13,7 +14,10 @@ def collect_dft(json_fname):
     pseudo = tokens[-4]
     #func,strain = tokens[3]; float(strain)/100.
     
-    energy = qer.read_first_energy(fname)
+    try:
+      energy = qer.read_first_energy(fname)
+    except:
+      energy = np.nan
     from mmap import mmap
     with open(fname,'r+') as f:
       mm = mmap(f.fileno(),0)
@@ -48,9 +52,13 @@ if __name__ == '__main__':
   fig,ax = plt.subplots(1,1)
   ax.set_xlabel(r'volume (bohr$^3$)',fontsize=16)
   ax.set_ylabel('total energy - min (Ry)',fontsize=16)
+  min_vol = df['volume'].min()
   for pseudo in df['pseudo'].unique():
     mydf = df[ df['pseudo']==pseudo ].sort_values('volume')
-    ax.plot(mydf['volume'],mydf['energy']-mydf['energy'].min(),'o-',label=pseudo)
+    vsel = mydf['volume'] == min_vol
+    eref = mydf.loc[vsel,'energy'].values[0]
+    ax.plot(mydf['volume'],mydf['energy']-eref,'o-',label=pseudo)
   # end for
+  ax.legend()
   plt.show()
 # end __main__
