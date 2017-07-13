@@ -1,0 +1,2 @@
+c_bfd_eg:  C.BFD.* from qmcpack/examples/solids folder
+c_bfd_bfd: C.BFD.* from qmcpack/pseudopotentials/BFD folder
