@@ -1,0 +1,30 @@
+#!/bin/bash
+#SBATCH --job-name dets
+#SBATCH -N 1
+#SBATCH -t 180
+
+BIN=/g/g91/yang41/soft/git_phfmol/phfmol.x
+export OMP_NUM_THREADS=72
+
+integral_file=../fcidump.dat
+inp0_ref=phfrun0.inp
+inp1_ref=phfrun1.inp
+ndet=myndet
+
+# run first calculation to reproduce HF determinant
+#  fort.100, phfrun.out, phfrun.dat and phfrun.det will be generated
+ln -s $integral_file fcidump.dat
+cp $inp0_ref phfrun.inp
+srun -n 1 $BIN >& mat.out.0
+mv phfrun.out phfrun.out.0
+mv fort.100 dets.0
+
+# run more calculations to generate a multi-determinant expansion
+for k in `seq 1 $ndet`; do
+  cp phfrun.det phfrun.det.$k
+  cp phfrun.dat phfrun.dat.$k
+  cp $inp1_ref phfrun.inp
+  srun -n 1 $BIN >& mat.out.$k
+  mv phfrun.out phfrun.out.$k
+  mv fort.100 dets.$k 
+done
