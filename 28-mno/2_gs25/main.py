@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
+import pandas as pd
 import h5py
 
 def build_cell(gs,verbose=3):
@@ -176,77 +177,115 @@ def modify_1rdm(dm,mn_dorb_indices,ndorb=5):
   return new_dm
 # end def modify_1rdm
 
+def write_uhf_multideterminant_spo(det_list,ndet,nfill,mf):
+  import pandas as pd
+  from pyscf_orbital_routines import multideterminant_orbitals
+
+  # ndet0: number of available determinants
+  ndet0,nspin,nmo,nmo1 = det_list.shape
+
+  # split into up and down determinants to reuse RHF routines
+  det_list_up = np.zeros([ndet,nmo,nmo],dtype=complex)
+  det_list_dn = np.zeros([ndet,nmo,nmo],dtype=complex)
+  for ispin in range(nspin): # up and down
+    for idet in range(ndet):
+      if ispin == 0:
+        det_list_up[idet,:,:] = det_list[idet,ispin,:,:]
+      elif ispin == 1:
+        det_list_dn[idet,:,:] = det_list[idet,ispin,:,:]
+      else:
+        raise RuntimeError('cannot handle ispin=%d'%ispin)
+      # end if
+    # end for idet
+  # end for ispin
+
+  gvecs_up, eig_df_up = multideterminant_orbitals(det_list_up,nfill,mf.cell,mf.mo_coeff[0],mf.kpt)
+  gvecs_dn, eig_df_dn = multideterminant_orbitals(det_list_dn,nfill,mf.cell,mf.mo_coeff[1],mf.kpt)
+  assert np.allclose(gvecs_up,gvecs_dn)
+  eig_df = pd.concat([eig_df_up,eig_df_dn])
+  return gvecs_up,eig_df
+# end def write_uhf_multideterminant_spo
+
 if __name__ == '__main__':
+
   from datetime import datetime
 
+  skip_scf   = True
+  verbosity  = 3
   grid_shape = [25]*3
+  ndet       = 10
+
+  # run pyscf to obtain mean-field object
   print('running HF...')
   print(datetime.now())
-  mf = run_pyscf(grid_shape,verbose=3)
+  mf = run_pyscf(grid_shape,verbose=verbosity)
   print(datetime.now())
   print(' HF done')
 
-  #from pyscf.scf.hf import init_guess_by_minao
-  #init_dm = init_guess_by_minao(mf.cell)
-  #np.savetxt('minao.dat',init_dm)
+  # make sure the SCF cycled is converged to the AFM state
+  if not skip_scf:
+    if not mf.converged:
 
-  if not mf.converged:
-    # get current 1RDM
-    dm = mf.make_rdm1()
-    np.savetxt('1rdm_up.dat',dm[0])
-    np.savetxt('1rdm_dn.dat',dm[1])
-    # enforce anti-ferromagnetic order
-    new_dm  = modify_1rdm(dm,[12,46])
-    np.savetxt('new_1rdm_up.dat',new_dm[0])
-    np.savetxt('new_1rdm_dn.dat',new_dm[1])
-    # rerun scf
-    print('rerunning HF...')
-    print(datetime.now())
-    mf.kernel(new_dm)
-    print(' HF done')
-    print(datetime.now())
+      #from pyscf.scf.hf import init_guess_by_minao
+      #init_dm = init_guess_by_minao(mf.cell)
+      #np.savetxt('minao.dat',init_dm)
+
+      # get current 1RDM
+      dm = mf.make_rdm1()
+      np.savetxt('1rdm_up.dat',dm[0])
+      np.savetxt('1rdm_dn.dat',dm[1])
+      # enforce anti-ferromagnetic order
+      new_dm  = modify_1rdm(dm,[12,46])
+      np.savetxt('new_1rdm_up.dat',new_dm[0])
+      np.savetxt('new_1rdm_dn.dat',new_dm[1])
+      # rerun scf
+      print('rerunning HF...')
+      print(datetime.now())
+      mf.kernel(new_dm)
+      print(' HF done')
+      print(datetime.now())
+    # end if
+
+    ## check state!
+    #labels = mf.cell.ao_labels(fmt=None)
+    #with open('basis.txt','w') as fout:
+    #  fout.write( ['%s  %s\n' % (label[2],label[3]) for label in labels] )
+    ## end with
+    print("Mulliken population:")
+    mp  = mf.mulliken_pop()
+
+    # save Hcore and Fock matrices for fcidump.h5
+    hcore = mf.get_hcore()
+    fock = (hcore + mf.get_veff())
+    if mf.chkfile:
+      with h5py.File(mf.chkfile) as fh5:
+        fh5['scf/hcore'] = hcore
+        fh5['scf/fock'] = fock
+      # end with
+    # end if not mf.converged
+  # end if skip_scf
+  #assert mf.converged
+
+  # ==== run run_int.py to generate fcidump.h5 ==== #
+  # ====  then run phfmol.x to generate determinants ==== #
+  # ====  finally run read_det_list.py to write 'det_list.dat' ==== #
+
+  # save Kohn-Sham eigensystem to dataframe
+  import os
+  if not (os.path.isfile('gvectors.dat') and os.path.isfile('eigensystem.json')):
+    nspin,nao,nmo = mf.mo_coeff.shape
+    nfill = mf.cell.tot_electrons()
+    det_list = np.loadtxt('det_list.dat').view(complex).reshape([ndet,nspin,nmo,nmo])
+    gvecs,df = write_uhf_multideterminant_spo(det_list,ndet,nfill,mf)
+    np.savetxt('gvectors.dat',gvecs)
+    df.reset_index().to_json('eigensystem.json')
+  else:
+    gvecs = np.loadtxt('gvectors.dat')
+    df = pd.read_json('eigensystem.json').set_index(['ikpt','ispin','istate'])
   # end if
 
-  labels = mf.cell.ao_labels(fmt=None)
-  #with open('basis.txt','w') as fout:
-  #  fout.write( ['%s  %s\n' % (label[2],label[3]) for label in labels] )
-  ## end with
-
-  print("Mulliken population:")
-  mp  = mf.mulliken_pop()
-
-  hcore = mf.get_hcore()
-  fock = (hcore + mf.get_veff())
-  if mf.chkfile:
-    with h5py.File(mf.chkfile) as fh5:
-      fh5['scf/hcore'] = hcore
-      fh5['scf/fock'] = fock
-    # end with
-  # end if
-
-  """
-  from pyscf import tools, ao2mo
-  from functools import reduce
-  cell = mf.cell
-  c = mf.mo_coeff
-  nmo = c.shape[1]
-
-  print('evaluating 1-electron integrals')
-  print(datetime.now())
-  h1e = reduce(np.dot, (c.T, mf.get_hcore(), c)) # 1-electron integrals
-  print(datetime.now())
-
-  print('evaluating 2-electron integrals')
-  print(datetime.now())
-  eri = mf.with_df.ao2mo(c) # 2-electron integrals
-  print(datetime.now())
-
-  print('restore 8-fold symmetry of the integral table')
-  eri = ao2mo.restore('s8',eri,nmo) # use 8-fold symmetry of integrals of real orbitals [ij|kl] = [kj|il\ etc.
-  print('dumping the integral table')
-  tools.fcidump.from_integrals('fcidump.dat',
-    h1e, eri, nmo, cell.nelectron,nuc=cell.energy_nuc(), ms=0)
-
-  """
+  # write QMCPACK wavefunction file
+  from pyscf_orbital_routines import generate_pwscf_h5
+  generate_pwscf_h5(mf.cell,gvecs,eig_df,pseudized_charge={'Mn':10,'O':2})
 
 # end __main__
