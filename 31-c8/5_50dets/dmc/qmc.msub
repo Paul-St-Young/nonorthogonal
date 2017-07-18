@@ -1,0 +1,14 @@
+#!/bin/bash
+#SBATCH --job-name dmc
+#SBATCH --tasks-per-node=36
+#SBATCH --cpus-per-task=1
+#SBATCH -N 20
+#SBATCH -p pbatch
+#SBATCH -t 24:00:00
+
+BIN=/g/g91/yang41/soft/quartz_qmcpack/build/bin/qmcpack
+
+export OMP_NUM_THREADS=1
+date
+srun -n 720 $BIN dmc.xml > out 2> err
+date
