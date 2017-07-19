@@ -74,8 +74,7 @@ def gamma_scf_input(func,exx,ecut,scf_job,system,dft_pseudos):
 
 if __name__ == '__main__':
 
-  run_id = 'core'
-  myname = 'hgh'
+  run_id = 'jtk_s'
   myname = 'bfd'
 
   jobs, pseudos = apply_machine_settings('quartz',myname)
@@ -106,6 +105,7 @@ if __name__ == '__main__':
   pm.add_simulations(scf_sims+p2q_sims+dmc_sims)
   pm.run_project()
 
+  # analysis
   data = []
   for scf in scf_sims:
     sa = scf.load_analyzer_image()
@@ -113,7 +113,6 @@ if __name__ == '__main__':
   # end for
   df = pd.DataFrame(data)
 
-  import pandas as pd
   df.to_json( '%s-%s.json' % (run_id,myname) )
 
 # end __main__

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
+import pandas as pd
 from nexus import obj
 
 def apply_machine_settings(machine,run_name):
@@ -151,11 +152,18 @@ def gamma_dmc_input(p2q,dmc_job,system,qmc_pseudos):
 
 if __name__ == '__main__':
 
+  run_id = 'c2-test-folder-ps'
   myname = 'hgh'
-  myname = 'bfd'
+  #myname = 'bfd'
 
   jobs, pseudos = apply_machine_settings('quartz',myname)
   struct = get_structure('c2.xsf')
+  #smat,ropt = struct.opt_tilematrix(volfac=4.0)
+  #struct.tile(smat).write('c2-8.xsf')
+  smat,ropt = struct.opt_tilematrix(volfac=8.0)
+  struct.tile(smat).write('c2-16.xsf')
+
+  #assert 1==0
   axes = struct.axes
   elem = struct.elem
   pos  = struct.pos
@@ -182,5 +190,15 @@ if __name__ == '__main__':
   pm = ProjectManager()
   pm.add_simulations(scf_sims+p2q_sims+dmc_sims)
   pm.run_project()
+
+  # analysis
+  data = []
+  for scf in scf_sims:
+    sa = scf.load_analyzer_image()
+    data.append( sa.to_dict() )
+  # end for
+  df = pd.DataFrame(data)
+
+  df.to_json( '%s-%s.json' % (run_id,myname) )
 
 # end __main__
