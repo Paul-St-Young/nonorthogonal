@@ -5,11 +5,11 @@ import pandas as pd
 import h5py
 
 def modify_1rdm(dm,mn_dorb_indices,ndorb=5):
-  """ impose anti-ferromagnetic on UHF density matrix
+  """ impose anti-ferromagnetic order on UHF density matrix
   Inputs:
     dm: 3D numpy array of shape (nspin,nao,nao) - expect nspin=2 for up and down 
     mn_dorb_indices: a list of int, one for each Mn atom - index of the first d orbital
-    ndorb: int, number of d orbitals - should be 5 right? 
+    ndorb: int, number of d orbitals - should be 5 for 3d right? 
   Output:
     new_dm: 3D numpy array, copied from dm, then modified """
 
@@ -18,21 +18,22 @@ def modify_1rdm(dm,mn_dorb_indices,ndorb=5):
   new_dm = dm.copy()
   for ispin in [0,1]:
 
-    # AFM order
+    # up and down spins cannot occupy the same orbital
     first_up = True
-    if ispin == 0:
+    if ispin != 0:
       first_up = False
 
-    set_up = first_up
-    for ibegin in mn_dorb_indices:
-      # set all d electrons
+    # impose AFM order
+    occupy = first_up
+    for ibegin in mn_dorb_indices: # loop through each Mn atom
+      # set all 3d electrons
       iend   = ibegin + ndorb
-      if set_up:
+      if occupy: # occupy orbitals
         new_dm[ispin,ibegin:iend,ibegin:iend] = 1.0 * np.eye(ndorb) 
-      else:
+      else: # vacate orbitals
         new_dm[ispin,ibegin:iend,ibegin:iend] = 0.0 * np.eye(ndorb) 
       # end if
-      set_up = not set_up 
+      occupy = not occupy # AFM order i.e. neighboring atoms anti-align
     # end for ibegin
 
   # end for ispin
@@ -139,8 +140,8 @@ if __name__ == '__main__':
   from step1_run_pyscf import run_pyscf
 
   from datetime import datetime
-  skip_afm   = True
-  verbosity  = 3
+  skip_afm   = False
+  verbosity  = 4
   grid_shape = [25]*3
   ndet       = 1
   gvec_fname = 'gvectors.dat'
@@ -161,10 +162,12 @@ if __name__ == '__main__':
     dm = mf.make_rdm1()
     np.savetxt('1rdm_up.dat',dm[0])
     np.savetxt('1rdm_dn.dat',dm[1])
+
     # enforce anti-ferromagnetic order
-    new_dm  = modify_1rdm(dm,[12,46])
+    new_dm = modify_1rdm(dm,[12,46])
     np.savetxt('new_1rdm_up.dat',new_dm[0])
     np.savetxt('new_1rdm_dn.dat',new_dm[1])
+
     # rerun scf
     print('rerunning HF...')
     print(datetime.now())
