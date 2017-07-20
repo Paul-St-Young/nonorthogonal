@@ -69,7 +69,7 @@ def write_uhf_multideterminant_spo(det_list,ndet,nfill,mf):
   return gvecs_up,eig_df
 # end def write_uhf_multideterminant_spo
 
-def write_qmcpack_input(inp_name,cell,wf_h5_fname,nup,ndn,wf_node=None,qmc_node=None,proj_id='mno'):
+def write_qmcpack_input(inp_name,cell,wf_h5_fname,nup,ndn,wf_node=None,qmc_nodes=[],proj_id='mno'):
   from input_xml import InputXml
   inp = InputXml()
 
@@ -128,8 +128,11 @@ def write_qmcpack_input(inp_name,cell,wf_h5_fname,nup,ndn,wf_node=None,qmc_node=
   root = etree.Element('simulation')
   doc = etree.ElementTree(root)
   root.append(sys_node)
-  if qmc_node is not None:
-    root.append(qmc_node)
+  if len(qmc_nodes) > 0:
+    for qmc_node in qmc_nodes:
+      root.append(qmc_node)
+    # end for
+  # end if
   doc.write(inp_name,pretty_print=True)
 # end def write_qmcpack_input
 
@@ -140,8 +143,8 @@ if __name__ == '__main__':
   from step1_run_pyscf import run_pyscf
 
   from datetime import datetime
-  skip_afm   = False
-  verbosity  = 4
+  skip_afm   = True
+  verbosity  = 3
   grid_shape = [25]*3
   ndet       = 1
   gvec_fname = 'gvectors.dat'
@@ -225,7 +228,9 @@ if __name__ == '__main__':
     wf_node = inp.uhf_slater(h5_fname,{'u':nup,'d':ndn},fftgrid=' '.join(fftgrid.astype(str)))
     nloop = 5
     opt_node = inp.get_optimization_node(nloop)
-    write_qmcpack_input(xml_fname,cell,h5_fname,nup,ndn,wf_node=wf_node,qmc_node=opt_node)
+    nwalker  = 4608 # 36*128
+    dmc_nodes = inp.get_dmc_nodes(nwalker)
+    write_qmcpack_input(xml_fname,cell,h5_fname,nup,ndn,wf_node=wf_node,qmc_nodes=dmc_nodes)
   # end if
 
 # end __main__
