@@ -2,74 +2,6 @@
 import os
 import numpy as np
 import pandas as pd
-import h5py
-
-def write_qmcpack_input(inp_name,cell,wf_h5_fname,nup,ndn,wf_node=None,qmc_nodes=[],proj_id='qmc'):
-  from input_xml import InputXml
-  inp = InputXml()
-
-  # build <project>
-  from lxml import etree
-  proj_node = etree.Element('project',{'id':proj_id,'series':'0'})
-
-  # build <simulationcell>
-  sc_node   = inp.simulationcell_from_cell(cell)
-
-  # build <particleset>
-  elec_pset_node= inp.ud_electrons(nup,ndn)
-  import h5py
-  fp = h5py.File(wf_h5_fname)
-  ion_pset_node = inp.particleset_from_hdf5(fp)
-
-  # build <wavefunction>
-  #  in another file
-
-  # build <hamiltonian>
-  ii_node = etree.Element('constant',{'type':'coulomb','name':'IonIon'
-    ,'source':ion_pset_node.get('name'),'target':ion_pset_node.get('name')})
-  ee_node = etree.Element('pairpot',{'type':'coulomb','name':'ElecElec'
-    ,'source':elec_pset_node.get('name'),'target':elec_pset_node.get('name')})
-
-  # !!!! hard-code electron-ion pseudized interaction
-  ei_node = etree.Element('pairpot',{'type':'pseudo','name':'PseudoPot'
-    ,'source':ion_pset_node.get('name'),'target':elec_pset_node.get('name')
-    ,'wavefunction':'psi0','format':'xml'})
-  pseudo_node = etree.Element('pseudo',{'elementType':'C','href':'C.BFD.xml'})
-  ei_node.append(pseudo_node)
-
-  ham_children = [ii_node,ee_node,ei_node]
-  ham_node = etree.Element('hamiltonian',{'name':'h0','type':'generic','target':elec_pset_node.get('name')})
-  for child in ham_children:
-    ham_node.append(child)
-  # end for
-
-  # assemble <qmcsystem>
-  sys_node = etree.Element('qmcsystem')
-  sys_children = [proj_node,sc_node,elec_pset_node,ion_pset_node,ham_node]
-
-  for child in sys_children:
-    # if give, insert <wavefunction> before <hamiltonian> 
-    if (child.tag == 'hamiltonian') and (wf_node is not None):
-      sys_node.append(wf_node)
-    # end if
-    sys_node.append(child)
-  # end for
-
-  # write input
-  from lxml import etree
-  root = etree.Element('simulation')
-  doc = etree.ElementTree(root)
-  root.append(sys_node)
-
-  # take <qmc> block from else where
-  if len(qmc_nodes) > 0:
-    for qmc_node in qmc_nodes:
-      root.append(qmc_node)
-    # end for
-  # end if
-
-  doc.write(inp_name,pretty_print=True)
-# end def write_qmcpack_input
 
 if __name__ == '__main__':
 
@@ -134,17 +66,19 @@ if __name__ == '__main__':
     fftgrid = 2*np.array(cell.gs)+1
     from input_xml import InputXml
     inp = InputXml()
+
+    # RHF determinant - need to add Jastrow!
     wf_node = inp.rhf_slater(h5_fname,nup,fftgrid=' '.join(fftgrid.astype(str)))
 
-    # write optimization input - need to add Jastrow!
+    pseudos = {'C':'C.BFD.xml'}
     nloop = 5
     opt_node = inp.get_optimization_node(nloop)
-    write_qmcpack_input(opt_inp,cell,h5_fname,nup,ndn,wf_node=wf_node,qmc_nodes=[opt_node],proj_id=proj_id)
+    inp.write_qmcpack_input(opt_inp,cell,h5_fname,nup,ndn,wf_node=wf_node,qmc_nodes=[opt_node],proj_id=proj_id,pseudos=pseudos)
 
     # write dmc input - need to add Jastrow!
     nwalker  = 4608 # 36*128
     dmc_nodes = inp.get_dmc_nodes(nwalker,nvmc_walkers=16)
-    write_qmcpack_input(dmc_inp,cell,h5_fname,nup,ndn,wf_node=wf_node,qmc_nodes=dmc_nodes,proj_id=proj_id)
+    inp.write_qmcpack_input(dmc_inp,cell,h5_fname,nup,ndn,wf_node=wf_node,qmc_nodes=dmc_nodes,proj_id=proj_id,pseudos=pseudos)
   # end if
 
 # end __main__
