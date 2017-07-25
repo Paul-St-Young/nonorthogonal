@@ -100,7 +100,7 @@ def append_ecut_scan(scf_sims,jobs,system):
 def inputs_to_scan_hse_exx(exx_list,scf_job,system):
   # setting defaults
   func   = 'hse'
-  ecut   = 40
+  ecut   = 320
 
   inputs = []
   for exx in exx_list:
@@ -140,12 +140,15 @@ if __name__ == '__main__':
   pm.run_project()
 
   # analysis
-  data = []
-  for scf in scf_sims:
-    sa = scf.load_analyzer_image()
-    data.append( sa.to_dict() )
-  # end for
-  df = pd.DataFrame(data)
-  df.to_json( 'mno4_qe_ecut_exx.json' )
+  dft_json = 'mno4_qe_ecut_exx.json'
+  if not os.path.isfile(dft_json):
+    data = []
+    for scf in scf_sims:
+      sa = scf.load_analyzer_image()
+      data.append( sa.to_dict() )
+    # end for
+    df = pd.DataFrame(data)
+    df.to_json( dft_json )
+  # end if
 
 # end __main__
