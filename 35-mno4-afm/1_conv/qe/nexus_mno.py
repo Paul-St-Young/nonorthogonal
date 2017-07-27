@@ -51,7 +51,7 @@ def get_structure(fname):
   return afm_struct
 # end def get_structure
 
-def default_scf_input(func,exx,ecut,scf_job,system,kgrid=[1,1,1],kshift=[0,0,0]):
+def default_scf_input(func,exx,ecut,scf_job,system,hubbard_u=None,kgrid=[1,1,1],kshift=[0,0,0]):
 
   myid = '%s-%d-ecut%d' % ( func,round(exx*100.),ecut )
 
@@ -71,6 +71,11 @@ def default_scf_input(func,exx,ecut,scf_job,system,kgrid=[1,1,1],kshift=[0,0,0])
     kshift  = kshift,
     disk_io = 'none'
   )
+
+  if hubbard_u is not None:
+    pwscf_inputs['hubbard_u'] = hubbard_u
+  # end if
+
   return pwscf_inputs
 # end def default_scf_input
 
@@ -121,6 +126,35 @@ def append_exx_scan(scf_sims,jobs,system):
   # end for
 # end def
 
+def inputs_to_scan_lda_plus_u(u_list,scf_job,system):
+  # setting defaults
+  func   = 'lda'
+  ecut   = 320
+  exx    = 0.
+
+  inputs = []
+  for myu in u_list:
+    pwscf_inputs = default_scf_input(func,exx,ecut,scf_job,system.copy(),hubbard_u={'Mn1':myu,'Mn2':myu,'O':0})
+    mypath = pwscf_inputs.path
+    subdir = os.path.dirname(mypath)
+    mydir  = os.path.basename(mypath)
+    pwscf_inputs.path = os.path.join( subdir, 'u%3.2f'%myu, mydir)
+    inputs.append(pwscf_inputs.copy())
+  # end for
+  return inputs
+# end def
+
+def append_u_scan(scf_sims,jobs,system):
+  subdir     = 'ldau'
+  u2scan   = [0.5,5.0,10.0]
+  hse_inputs = inputs_to_scan_lda_plus_u(u2scan,jobs['ldau'],system)
+  for myinput in hse_inputs:
+    myinput.path = os.path.join(subdir,myinput.path)
+    scf = generate_pwscf(**myinput)
+    scf_sims.append(scf)
+  # end for
+# end def
+
 if __name__ == '__main__':
   xsf_file = '../../struct/mno.xsf'
   jobs = apply_machine_settings('quartz')
@@ -133,6 +167,7 @@ if __name__ == '__main__':
   scf_sims = []
   append_ecut_scan(scf_sims,jobs,system)
   append_exx_scan(scf_sims,jobs,system)
+  append_u_scan(scf_sims,jobs,system)
 
   from nexus import ProjectManager
   pm = ProjectManager()
@@ -140,15 +175,12 @@ if __name__ == '__main__':
   pm.run_project()
 
   # analysis
-  dft_json = 'mno4_qe_ecut_exx.json'
-  if not os.path.isfile(dft_json):
-    data = []
-    for scf in scf_sims:
-      sa = scf.load_analyzer_image()
-      data.append( sa.to_dict() )
-    # end for
-    df = pd.DataFrame(data)
-    df.to_json( dft_json )
-  # end if
+  data = []
+  for scf in scf_sims:
+    sa = scf.load_analyzer_image()
+    data.append( sa.to_dict() )
+  # end for
+  df = pd.DataFrame(data)
+  df.to_json( 'mno4_qe_ecut_exx.json' )
 
 # end __main__
