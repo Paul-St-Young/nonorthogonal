@@ -82,7 +82,7 @@ if __name__ == '__main__':
   chkfile = '../a-hf/bfd.h5'
   fockh5  = '../a-hf/fock.h5'
   ndet    = 50
-  wfntyp  = 'rhf'
+  wfntyp  = 'uhf'
   igstyp  = 0 # new determinant guess type - 0=read file phfrun.det
   igsnmx  = 3 # number of orbitals to mix
   igsmix  = 3 # strength of mixing - 3=medium

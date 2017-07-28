@@ -17,11 +17,11 @@ def apply_machine_settings(machine):
   )
   if machine == 'quartz':
     pbe_job = Job(nodes=1,cores=4,minutes=30,queue='pdebug')
-    hse_job = Job(nodes=1,cores=36,hours=1)
+    hse_job = Job(nodes=1,cores=36,hours=1,account='qmchhp')
     lda_plus_u_job = Job(nodes=1,cores=4,minutes=30,queue='pdebug')
-    p2q_job = Job(nodes=1,serial=True,minutes=15)
-    opt_job = Job(nodes=16,hours=1,app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp')
-    dmc_job = Job(nodes=20,hours=2,account='qmchhp',app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp')
+    p2q_job = Job(nodes=1,serial=True,minutes=15,queue='pdebug')
+    opt_job = Job(nodes=16,hours=2,app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp',account='qmchhp')
+    dmc_job = Job(nodes=16,hours=4,account='qmchhp',app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp')
   else: # workstation, defaults should do
     pbe_job = Job()
     hse_job = Job()
@@ -205,7 +205,7 @@ def gamma_opt_input(p2q,opt_job,system):
     samples     = 144000,
     checkpoint  = 0
   )
-  calcs = [loop(max=20,qmc=linear(**linopt))]
+  calcs = [loop(max=5,qmc=linear(**linopt))]
 
   init_jas = hf_jastrows()
 
@@ -252,10 +252,10 @@ def gamma_dmc_input(p2q,opt,dmc_job,system):
   )
   dmc_input = obj(
     warmupsteps = 40,
-    blocks      = 400,
+    blocks      = 40,
     steps       = 40,   # will be overwritten
     timestep    = 0.02, # will be overwritten
-    checkpoint  = 100
+    checkpoint  = 0
   )
   calcs = [vmc(**vmc_input)]
   for ts in tss:
