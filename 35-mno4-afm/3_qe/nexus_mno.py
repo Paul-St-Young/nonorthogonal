@@ -17,11 +17,11 @@ def apply_machine_settings(machine):
   )
   if machine == 'quartz':
     pbe_job = Job(nodes=1,cores=4,minutes=30,queue='pdebug')
-    hse_job = Job(nodes=1,cores=36,hours=6)
+    hse_job = Job(nodes=1,cores=36,hours=1)
     lda_plus_u_job = Job(nodes=1,cores=4,minutes=30,queue='pdebug')
     p2q_job = Job(nodes=1,serial=True,minutes=15)
-    opt_job = Job(nodes=4,hours=1,app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp')
-    dmc_job = Job(nodes=20,hours=4,account='qmchhp',app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp')
+    opt_job = Job(nodes=16,hours=1,app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp')
+    dmc_job = Job(nodes=20,hours=2,account='qmchhp',app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp')
   else: # workstation, defaults should do
     pbe_job = Job()
     hse_job = Job()
@@ -157,11 +157,11 @@ def p2q_input_from_scf(scf,p2q_job):
 def hf_jastrows():
 
   # get coefficients 
-  mn1_j1coeff_text = '-1.659547621 -1.543302323 -1.307687624 -0.9902665647 -0.7102498618 -0.53080143 -0.3563316541 -0.2492331827'
-  mn2_j1coeff_text = '-0.8273295532 -0.7517939818 -0.5069918279 -0.2259384977 -0.04631691499 0.0197302741 0.03730845024 0.04693037799'
-  o_j1coeff_text  = '-0.3442607874 -0.2936971837 -0.2292136695 -0.1546252236 -0.1103504367 -0.09407421054 -0.06398248129 -0.04230438705'
-  j2uu_text = '0.3106257352 0.2245131638 0.1647228383 0.1118443597 0.07590016152 0.04741092948 0.02459199409 0.01175994094'
-  j2ud_text = '0.4393978199 0.2999445804 0.2106775191 0.1424467661 0.09722690905 0.05934016809 0.03218846169 0.01604788512'
+  mn1_j1coeff_text = '-2.916291331 -2.79855945 -2.558033332 -2.226421313 -1.843365663 -1.411587226 -0.893282313 -0.4764249498'
+  mn2_j1coeff_text = '-1.187103165 -1.064759167 -0.8450658369 -0.5410089754 -0.247669876 -0.02845378027 0.08280421186 0.11118505'
+  o_j1coeff_text  = '-0.8078107508 -0.7385166615 -0.658887247 -0.5487006968 -0.4312140372 -0.3270768785 -0.2014092658 -0.08796479085'
+  j2uu_text = '0.3072025819 0.2417595805 0.1812174375 0.1331879365 0.09271434913 0.0604246262 0.03300067526 0.01541665883'
+  j2ud_text = '0.4420184348 0.3137089166 0.2241094917 0.1622985713 0.113953872 0.07556330908 0.04267892588 0.02095134822'
 
   mn1_j1coeff = map(float,mn1_j1coeff_text.split())
   mn2_j1coeff = map(float,mn2_j1coeff_text.split())
@@ -183,7 +183,7 @@ def hf_jastrows():
 
   j2 = generate_jastrow2(function='bspline',size=len(j2uu),coeff=[j2uu,j2ud],init=None)
   return j1,j2
-# end def
+# end def hf_jastrows
 
 def gamma_opt_input(p2q,opt_job,system):
   from nexus import loop, linear
@@ -202,10 +202,10 @@ def gamma_opt_input(p2q,opt_job,system):
     substeps    =   3,
     timestep    = 1.0,
     walkers     = 16,
-    samples     = 16384,
+    samples     = 144000,
     checkpoint  = 0
   )
-  calcs = [loop(max=5,qmc=linear(**linopt))]
+  calcs = [loop(max=20,qmc=linear(**linopt))]
 
   init_jas = hf_jastrows()
 
