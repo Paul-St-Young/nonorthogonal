@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
 
-  ls_map = {'hgh':'-','jtk_s':':','jtk_p':'--'}
-  cmap   = {'hgh':'k','jtk_s':'r','jtk_p':'b'}
+  ls_map = {'hgh':'-','jtk_s':':','jtk_p':'--','jtk_opt':'-.'}
+  cmap   = {'hgh':'k','jtk_s':'r','jtk_p':'b','jtk_opt':'g'}
 
   df0 = pd.read_json('3_mno_core_ref/core-hgh.json')
   df0['psp'] = 'hgh'
@@ -14,8 +14,10 @@ if __name__ == '__main__':
   df1['psp'] = 'jtk_s'
   df2 = pd.read_json('5_mno_jtk_plocal/jtk_p-bfd.json')
   df2['psp'] = 'jtk_p'
+  df3 = pd.read_json('7_mno_jtk_opt/jtk_opt-opt.json')
+  df3['psp'] = 'jtk_opt'
 
-  df = pd.concat([df0,df1,df2]).reset_index(drop=True)
+  df = pd.concat([df0,df1,df2,df3]).reset_index(drop=True)
   fig,ax = plt.subplots(1,1)
   ax.set_xlabel('volume (a.u.)',fontsize=16)
   ax.set_ylabel('DFT(PBE) energy relative to volume 294 a.u. (ha)',fontsize=16)
