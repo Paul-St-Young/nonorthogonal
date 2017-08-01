@@ -5,6 +5,7 @@ import pandas as pd
 from nexus import obj
 
 def apply_machine_settings(machine):
+  account = 'qmchhp'
   if machine != 'quartz' and (not machine.startswith('ws')):
     raise NotImplementedError('cannot handle machine=%s yet'%machine)
   # end if
@@ -17,11 +18,11 @@ def apply_machine_settings(machine):
   )
   if machine == 'quartz':
     pbe_job = Job(nodes=1,cores=4,minutes=30,queue='pdebug')
-    hse_job = Job(nodes=1,cores=36,hours=1,account='qmchhp')
+    hse_job = Job(nodes=1,cores=36,hours=1,account=account)
     lda_plus_u_job = Job(nodes=1,cores=4,minutes=30,queue='pdebug')
     p2q_job = Job(nodes=1,serial=True,minutes=15,queue='pdebug')
-    opt_job = Job(nodes=16,hours=2,app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp',account='qmchhp')
-    dmc_job = Job(nodes=16,hours=4,account='qmchhp',app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp')
+    opt_job = Job(nodes=16,minutes=30,app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp',account=account)
+    dmc_job = Job(nodes=16,hours=4,app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp',account=account)
   else: # workstation, defaults should do
     pbe_job = Job()
     hse_job = Job()
@@ -157,11 +158,11 @@ def p2q_input_from_scf(scf,p2q_job):
 def hf_jastrows():
 
   # get coefficients 
-  mn1_j1coeff_text = '-2.916291331 -2.79855945 -2.558033332 -2.226421313 -1.843365663 -1.411587226 -0.893282313 -0.4764249498'
-  mn2_j1coeff_text = '-1.187103165 -1.064759167 -0.8450658369 -0.5410089754 -0.247669876 -0.02845378027 0.08280421186 0.11118505'
-  o_j1coeff_text  = '-0.8078107508 -0.7385166615 -0.658887247 -0.5487006968 -0.4312140372 -0.3270768785 -0.2014092658 -0.08796479085'
-  j2uu_text = '0.3072025819 0.2417595805 0.1812174375 0.1331879365 0.09271434913 0.0604246262 0.03300067526 0.01541665883'
-  j2ud_text = '0.4420184348 0.3137089166 0.2241094917 0.1622985713 0.113953872 0.07556330908 0.04267892588 0.02095134822'
+  mn1_j1coeff_text = '-1.483208875 -1.385382042 -1.180714283 -0.9043116783 -0.6352099633 -0.4041293897 -0.2170234034 -0.09274449926'
+  mn2_j1coeff_text = '-1.465144303 -1.368282493 -1.164598758 -0.8889359302 -0.6209817792 -0.395609743 -0.2143318078 -0.09357283347'
+  o_j1coeff_text  = '-0.539267623 -0.4873117394 -0.4111690783 -0.3176563822 -0.2271615257 -0.1564606378 -0.08493166439 -0.03849512579'
+  j2uu_text = '0.2718661354 0.2042450803 0.1478289834 0.1023160669 0.06683466378 0.03940165903 0.0193433924 0.00690914963'
+  j2ud_text = '0.3954069671 0.266828896 0.180900255 0.1233359256 0.0816733275 0.0494462146 0.02551511273 0.01093731508'
 
   mn1_j1coeff = map(float,mn1_j1coeff_text.split())
   mn2_j1coeff = map(float,mn2_j1coeff_text.split())
@@ -202,8 +203,8 @@ def gamma_opt_input(p2q,opt_job,system):
     substeps    =   3,
     timestep    = 1.0,
     walkers     = 16,
-    samples     = 144000,
-    checkpoint  = 0
+    samples     = 28800,
+    checkpoint  = 0,
   )
   calcs = [loop(max=5,qmc=linear(**linopt))]
 
@@ -223,7 +224,8 @@ def gamma_opt_input(p2q,opt_job,system):
     estimators   = [],
     jastrows     = init_jas,
     pseudos      = ['Mn.BFD.xml','O.BFD.xml'],
-    dependencies = [(p2q,'orbitals')]
+    dependencies = [(p2q,'orbitals')],
+    spin_polarized = True
   )
   return opt_inputs
 # end def gamma_opt_input
@@ -236,9 +238,9 @@ def gamma_dmc_input(p2q,opt,dmc_job,system):
   mypath = p2q.path.replace(nscf_dir,'dmc')
 
   # dmc time steps to try
-  tss = [0.01,0.005]
+  tss = [0.008,0.004]
   # vmc correlation time in a.u.
-  correlation_time = 1.0
+  correlation_time = 0.5
 
   vmc_input = obj(
     warmupsteps =  40,
@@ -247,7 +249,7 @@ def gamma_dmc_input(p2q,opt,dmc_job,system):
     substeps    =   3,
     timestep    = 1.0,
     walkers     = 16,
-    samples     =4320, # dmc walkers
+    samples     =4608, # dmc walkers
     checkpoint  = 0
   )
   dmc_input = obj(
@@ -277,7 +279,8 @@ def gamma_dmc_input(p2q,opt,dmc_job,system):
     estimators   = [],
     jastrows     = [],
     pseudos      = ['Mn.BFD.xml','O.BFD.xml'],
-    dependencies = [(p2q,'orbitals'),(opt,'jastrow')]
+    dependencies = [(p2q,'orbitals'),(opt,'jastrow')],
+    spin_polarized = True
   )
   return dmc_inputs
 # end def gamma_dmc_input

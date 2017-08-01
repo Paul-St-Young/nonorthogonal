@@ -3,7 +3,8 @@ import os
 import subprocess as sp
 
 if __name__ == '__main__':
-  cmd = 'find . -name *-dmc.sbatch.in'
+  subfix = 'scf'
+  cmd = 'find . -name *-%s.sbatch.in' % subfix
   proc = sp.Popen(cmd,shell=True,stdout=sp.PIPE,stderr=sp.PIPE)
   out,err = proc.communicate()
 
