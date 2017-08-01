@@ -22,7 +22,7 @@ def apply_machine_settings(machine):
     lda_plus_u_job = Job(nodes=1,cores=4,minutes=30,queue='pdebug')
     p2q_job = Job(nodes=1,serial=True,minutes=15,queue='pdebug')
     opt_job = Job(nodes=16,minutes=30,app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp',account=account)
-    dmc_job = Job(nodes=16,hours=4,app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp',account=account)
+    dmc_job = Job(nodes=16,hours=1,app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp',account=account)
   else: # workstation, defaults should do
     pbe_job = Job()
     hse_job = Job()
