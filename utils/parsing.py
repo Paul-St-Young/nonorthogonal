@@ -22,7 +22,7 @@ def parse_qmcas_output(fname):
   # parse outputs such as:
   #  ./detsci49_af/c2  series 0  -10.452004 +/- 0.006424    1.6   1.601253 +/- 0.068660    1.1   0.1532
 
-  data = {'myid':[],'energy_mean':[],'energy_error':[],'method':[],'iqmc':[]}
+  data = {'myid':[],'energy_mean':[],'energy_error':[],'variance_mean':[],'variance_error':[],'correlation':[],'method':[],'iqmc':[]}
   with open(fname) as f:
     for line in f:
       tokens = line.split()
@@ -42,10 +42,17 @@ def parse_qmcas_output(fname):
         energy_mean  = float(tokens[3])
         energy_error = float(tokens[5])
 
+        # read correlation
+        correlation  = float(tokens[6])
+
+        # read variance
+        variance_mean  = float(tokens[7])
+        variance_error = float(tokens[9])
+
         # organize data in table
         label_and_data = zip(
-          ['myid','energy_mean','energy_error','method','iqmc'],
-          [myid,energy_mean,energy_error,method,iqmc]
+          ['myid','energy_mean','energy_error','method','iqmc','variance_mean','variance_error','correlation'],
+          [myid,energy_mean,energy_error,method,iqmc,variance_mean,variance_error,correlation]
         )
         for key,val in label_and_data:
           data[key].append(val)
