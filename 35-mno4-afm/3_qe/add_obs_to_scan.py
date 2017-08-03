@@ -4,20 +4,21 @@ import subprocess as sp
 import numpy as np
 from lxml import etree
 
-def main():
-  inp_loc = './scan/ldau/lda-0-ecut320/u0.50/dmc/lda-0-ecut320-dmc.in.xml'
-  cont_iseries = 2
+def continue_input(inp_loc,cont_iseries,pseudos,ntimes=1):
+  from input_xml import InputXml
+  inp = InputXml()
+  inp.read(inp_loc)
+
+  # estimator settings
+  gr_num_bin = 50
+  grid_shape = np.array([20,20,20])
+  ests = [inp.sk(),inp.gr(gr_num_bin),inp.spindensity(grid_shape),inp.sksp(),inp.localmoment()]
+
   is_text = str(cont_iseries).zfill(3)
   cont_postfix = '.s%s.config.h5' % is_text  # walkers
   rand_postfix = '.s%s.random.xml' % is_text # random number generator state
   qmc_postfix  = '.s%s.qmc.xml' % is_text    # branch engine state
   sub_postfix = '.sbatch.in'
-  ntimes = 16 # multiply the number of blocks
-  pseudos = ['Mn.BFD.xml','O.BFD.xml']
-
-  from input_xml import InputXml
-  inp = InputXml()
-  inp.read(inp_loc)
 
   # get project id
   proj_node = inp.find('.//project')
@@ -26,9 +27,7 @@ def main():
 
   # add estimators
   ham = inp.find('.//hamiltonian')
-  gr_num_bin = 50
-  grid_shape = np.array([20,20,20])
-  for est in [inp.sk(),inp.gr(gr_num_bin),inp.spindensity(grid_shape),inp.sksp(),inp.localmoment()]:
+  for est in ests:
     ham.append( est )
   # end for
 
@@ -75,14 +74,14 @@ def main():
   # send submission script
   sub_file = os.path.join(inp_dir,prefix+sub_postfix)
   new_sub  = os.path.join(new_dir,os.path.basename(sub_file))
-  sp.check_call(['cp',sub_file,new_sub])
+  #sp.check_call(['cp',sub_file,new_sub])
   # edit submission script
-  with open(new_sub,'r') as f:
+  with open(sub_file,'r') as f:
     sub_text = f.read()
   # end if
-  sub_text.replace('-t 01:00:00','-t 04:00:00')
+  new_sub_text = sub_text.replace('-t 01:00:00','-t 04:00:00')
   with open(new_sub,'w') as f:
-    f.write(sub_text)
+    f.write(new_sub_text)
   # end if
 
   # send pseudopotentials
@@ -93,6 +92,30 @@ def main():
   # send new input
   new_infile = os.path.join( new_dir, os.path.basename(inp_loc) )
   inp.write(new_infile)
+# end def continue_input
+
+def main():
+  cont_iseries = 2
+  ntimes = 16 # multiply the number of blocks
+  pseudos = ['Mn.BFD.xml','O.BFD.xml']
+
+  #inp_loc = './scan/ldau/lda-0-ecut320/u0.50/dmc/lda-0-ecut320-dmc.in.xml'
+  run_dir =  './scan/'
+  lda_dir = 'ldau/lda-0-ecut320'
+  for uval in [0.5,5.0,10.0]:
+    udir = 'u%3.2f'%uval
+    inp_dir = os.path.join(run_dir,lda_dir,udir,'dmc')
+    inp_loc = sp.check_output('ls %s/*-dmc.in.xml'%inp_dir,shell=True).strip('\n')
+    continue_input(inp_loc,cont_iseries,pseudos,ntimes=ntimes)
+  # end for uval
+
+  exx_dir = 'exx'
+  for exx in [0,25,50,75,100]:
+    udir = 'hse-%d-ecut320'%exx
+    inp_dir = os.path.join(run_dir,exx_dir,udir,'dmc')
+    inp_loc = sp.check_output('ls %s/*-dmc.in.xml'%inp_dir,shell=True).strip('\n')
+    continue_input(inp_loc,cont_iseries,pseudos,ntimes=ntimes)
+  # end for uval
 
 # end def main
 
