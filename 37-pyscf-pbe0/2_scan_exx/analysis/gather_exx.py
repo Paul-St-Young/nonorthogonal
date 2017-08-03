@@ -61,6 +61,7 @@ if __name__ == '__main__':
 
   ax.get_yaxis().set_major_formatter( FormatStrFormatter("%7.2f") )
   ax.legend(loc='upper left')
+  fig.tight_layout()
   fig.savefig('pyscf_pbe0_exx_scan.png',dpi=320)
   plt.show()
 
