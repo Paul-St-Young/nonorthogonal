@@ -19,14 +19,14 @@ def plot_styles():
   return color_map_basis, ls_map_wf, marker_map_method
 # end def plot_styles
 
-def isosurf(ax,vol,level=None):
+def isosurf(ax,vol,level_frac=0.5):
     """ draw iso surface of volumetric data on matplotlib axis at given level
     Inputs:
       ax: matplotlib axis with projection='3d' 
       vol: 3D volumetric data as a numpy array (nx,ny,nz) 
-      level: value of iso surface
+      level_frac: float 0.0->1.0 isosurface value as a fraction between min and max
     Output:
-      None
+      mesh: Poly3DCollection object
     Effect:
       draw on ax """
     from skimage import measure
@@ -34,12 +34,9 @@ def isosurf(ax,vol,level=None):
     nx,ny,nz = vol.shape
     lmin,lmax = vol.min(),vol.max()
 
-    if level is None: # set level to average if none given
-        level = 0.5*(lmin+lmax)
-    else: # check isosurface level
-        if level<lmin or level>lmax:
-            raise RuntimeError('level must be >%f and < %f'%(lmin,lmax))
-        # end if
+    level = lmin + level_frac*(lmax+lmin)
+    if level<lmin or level>lmax:
+        raise RuntimeError('level must be >%f and < %f'%(lmin,lmax))
     # end if
 
     # make marching cubes
