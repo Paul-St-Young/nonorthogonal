@@ -29,7 +29,7 @@ if __name__ == '__main__':
   sys.path.insert(0,'../../../utils')
   from parsing import parse_qmcas_output
 
-  result_fname = '../scan/exx/results.dat'
+  result_fname = '../cont_scan/exx/results.dat'
   df0 = parse_qmcas_output(result_fname)
   settings = df0['myid'].apply(exx_from_myid)
   df = pd.concat([settings,df0],axis=1)
@@ -60,6 +60,7 @@ if __name__ == '__main__':
 
   ax.get_yaxis().set_major_formatter( FormatStrFormatter("%7.2f") )
   ax.legend(loc='upper left')
+  fig.tight_layout()
   fig.savefig('qmc_exx_scan.png',dpi=320)
   plt.show()
 

@@ -20,7 +20,7 @@ if __name__ == '__main__':
   sys.path.insert(0,'../../../utils')
   from parsing import parse_qmcas_output
 
-  result_fname = '../scan/ldau/lda-0-ecut320/results.dat'
+  result_fname = '../cont_scan/ldau/lda-0-ecut320/results.dat'
   df0 = parse_qmcas_output(result_fname)
   settings = df0['myid'].apply(ldau_from_myid)
   df = pd.concat([settings,df0],axis=1)
@@ -50,6 +50,7 @@ if __name__ == '__main__':
 
   ax.get_yaxis().set_major_formatter( FormatStrFormatter("%7.2f") )
   ax.legend(loc='upper left')
+  fig.tight_layout()
   fig.savefig('qmc_ldau_scan.png',dpi=320)
   plt.show()
 
