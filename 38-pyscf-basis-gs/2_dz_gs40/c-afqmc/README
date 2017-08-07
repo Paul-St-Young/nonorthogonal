@@ -1,0 +1,10 @@
+To obtain the expansion coefficients for 50 determinants, for example:
+1. run setup_get_det_dir.py with the appropriate 'ndet' variable
+  this will create 'get50/determinants1.det', which contains 50 determinants
+2. run AFQMC using the multi-determinant w.f. generated in step 1
+  pipe output to 'get50/out50'
+3. run read_afci.py to grab the CI coefficients from output
+  afcoeff50.dat should be generate
+
+Too many determinants were generated in b-phf, I don't want det_list_800.dat.
+Thus parse_phfmol.py was copied over from b-phf to create det_list_150.dat, using truncated 'get150/determinants1.det'

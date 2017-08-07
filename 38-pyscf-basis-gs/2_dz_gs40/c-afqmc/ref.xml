@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<simulation method="afqmc">
+  <project id="mno" series="0"/>
+
+  <AFQMCInfo name="info0">  
+    <parameter name="NMO">116</parameter>
+    <parameter name="NAEA">21</parameter>
+    <parameter name="NAEB">21</parameter>
+    <parameter name="NETOT">42</parameter>
+    <parameter name="NCA">0</parameter>
+    <parameter name="NCB">0</parameter>
+  </AFQMCInfo>  
+
+  <Hamiltonian name="ham0" type="SparseGeneral" info="info0">
+    <parameter name="filetype">hdf5</parameter>
+    <parameter name="filename">../../i-phf/fcidump.h5</parameter>
+    <parameter name="cutoff_1bar">1e-6</parameter>
+    <parameter name="cutoff_2bar">1e-6</parameter>
+    <parameter name="cutoff_decomposition">1e-5</parameter>
+    <parameter name="hdf_write_file">ham.h5</parameter> 
+  </Hamiltonian>
+
+  <Wavefunction name="wfn0" info="info0">
+    <ImpSamp name="impsamp0" type="MultiPureSD">
+      <parameter name="filetype">ascii</parameter>
+      <parameter name="filename">mydet</parameter>
+      <parameter name="cutoff">1e-6</parameter>
+      <parameter name="hdf_write_file">wfn.h5</parameter> 
+    </ImpSamp>    
+  </Wavefunction>
+
+  <WalkerSet name="wset0" type="distributed">
+    <parameter name="min_weight">0.05</parameter>    
+    <parameter name="max_weight">4</parameter>    
+    <parameter name="reset_weight">1</parameter>    
+    <parameter name="extra_spaces">10</parameter>    
+  </WalkerSet>
+
+  <Propagator name="prop0" phaseless="yes" localenergy="yes" drift="yes" info="info0">
+    <parameter name="cutoff_propg">1e-6</parameter>
+    <parameter name="hdf_write_file">prop.h5</parameter> 
+    <parameter name="parallel_factorization">yes</parameter> 
+  </Propagator>
+
+  <execute wset="wset0" ham="ham0" wfn="wfn0" prop="prop0" info="info0">
+    <parameter name="timestep">0.005</parameter>
+    <parameter name="blocks">1</parameter>
+    <parameter name="steps">4</parameter>
+    <parameter name="substeps">1</parameter>
+    <parameter name="nWalkers">1</parameter>
+  </execute> 
+
+</simulation>
