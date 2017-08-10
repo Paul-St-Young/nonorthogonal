@@ -20,10 +20,12 @@ if __name__ == '__main__':
   sys.path.insert(0,'../../../utils')
   from parsing import parse_qmcas_output
 
-  result_fname = '../cont_scan/ldau/lda-0-ecut320/results.dat'
+  rundir_prefix = 'excited' 
+  result_fname = '../%s_scan/ldau/lda-0-ecut320/results.dat' % rundir_prefix
   df0 = parse_qmcas_output(result_fname)
   settings = df0['myid'].apply(ldau_from_myid)
   df = pd.concat([settings,df0],axis=1)
+  df.to_json('%s_ldau.json'%rundir_prefix)
 
   import matplotlib.pyplot as plt
   from matplotlib.ticker import FormatStrFormatter

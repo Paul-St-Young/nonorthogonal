@@ -21,8 +21,8 @@ def apply_machine_settings(machine):
     hse_job = Job(nodes=1,cores=36,hours=1,account=account)
     lda_plus_u_job = Job(nodes=1,cores=4,minutes=30,queue='pdebug')
     p2q_job = Job(nodes=1,serial=True,minutes=15,queue='pdebug')
-    opt_job = Job(nodes=16,minutes=30,app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp',account=account)
-    dmc_job = Job(nodes=16,hours=1,app='/g/g91/yang41/soft/master_qmcpack/build/bin/qmcpack_comp',account=account)
+    opt_job = Job(nodes=16,minutes=30,app='~/soft/master_qmcpack/build/bin/qmcpack_comp',account=account)
+    dmc_job = Job(nodes=16,hours=4,app='~/soft/master_qmcpack/build/bin/qmcpack_comp',account=account)
   else: # workstation, defaults should do
     pbe_job = Job()
     hse_job = Job()
@@ -132,7 +132,7 @@ def inputs_to_scan_lda_plus_u(u_list,scf_job,system):
 
 def append_u_scan(scf_sims,jobs,system):
   subdir     = 'ldau'
-  u2scan   = [0.5,5.0,10.0]
+  u2scan   = [0.5,2,4,5.0,6,8,10.0]
   hse_inputs = inputs_to_scan_lda_plus_u(u2scan,jobs['ldau'],system)
   for myinput in hse_inputs:
     myinput.path = os.path.join(subdir,myinput.path)
@@ -244,7 +244,7 @@ def gamma_dmc_input(p2q,opt,dmc_job,system):
 
   vmc_input = obj(
     warmupsteps =  40,
-    blocks      = 200,
+    blocks      = 640,
     steps       =  10,
     substeps    =   3,
     timestep    = 1.0,
@@ -254,7 +254,7 @@ def gamma_dmc_input(p2q,opt,dmc_job,system):
   )
   dmc_input = obj(
     warmupsteps = 40,
-    blocks      = 40,
+    blocks      = 640,
     steps       = 40,   # will be overwritten
     timestep    = 0.02, # will be overwritten
     checkpoint  = 0
@@ -267,6 +267,7 @@ def gamma_dmc_input(p2q,opt,dmc_job,system):
   # end for ts
   mysystem = system.copy()
   mysystem.structure.kpoints = np.array([[0.,0.,0.]]) # system must have kpoints to assign twistnums
+
   dmc_inputs  = obj(
     identifier  = myid,
     path        = mypath,
@@ -304,6 +305,7 @@ if __name__ == '__main__':
   p2q_sims = []
   opt_sims = []
   dmc_sims = []
+  """ # skip QMC to construct DFT dataframe
   for scf in scf_sims:
     p2q_inputs = p2q_input_from_scf(scf,jobs['p2q'])
     p2q = generate_pw2qmcpack(**p2q_inputs)
@@ -315,10 +317,23 @@ if __name__ == '__main__':
     opt_sims.append(opt)
     dmc_sims.append(sdmc)
   # end for scf
+  """
   
   from nexus import ProjectManager
   pm = ProjectManager()
   pm.add_simulations(scf_sims+p2q_sims+opt_sims+dmc_sims)
   pm.run_project()
+
+  dft_data_json = 'dft_data.json'
+  if not os.path.isfile(dft_data_json):
+    dft_data = []
+    for scf in scf_sims:
+      pa = scf.load_analyzer_image()
+      dft_data.append( pa.to_dict() )
+    # end for
+
+    dft_df = pd.DataFrame(dft_data)
+    dft_df.to_json(dft_data_json)
+  # end if
 
 # end __main__
