@@ -1,3 +1,4 @@
+
 def plot_styles():
   color_map_basis = {
   'double-zeta':'k',
@@ -55,3 +56,27 @@ def isosurf(ax,vol,level_frac=0.5):
     ax.set_zlabel('z')
     return mesh
 # end def isosurf
+
+def draw_cell(ax,axes,pos,atom_color='b',draw_super=True):
+  atoms = []
+  dots  = ax.plot(pos[:,0],pos[:,1],pos[:,2],'o',c=atom_color,ms=10)
+  atoms.append(dots)
+  if draw_super:
+    import numpy as np
+    from itertools import product
+    for ix,iy,iz in product(range(2),repeat=3):
+      if ix==iy==iz==0:
+        continue
+      shift = (np.array([ix,iy,iz])*axes).sum(axis=0)
+      spos  = (shift.reshape(-1,1,3) + pos).reshape(-1,3)
+      dots  = ax.plot(spos[:,0],spos[:,1],spos[:,2],'o',c='gray',ms=10,alpha=0.8)
+      atoms.append(dots)
+
+  # show simulation cell
+  cell = []
+  for idim in range(3):
+    line = ax.plot([0,axes[idim,0]],[0,axes[idim,1]],[0,axes[idim,2]],c='k',lw=2)
+    cell.append(line)
+
+  return atoms,cell
+# end def
